@@ -68,7 +68,7 @@ void salt2(cv::Mat image, int n) {
 	std::uniform_int_distribution<int> randomCol(0, image.cols - 1);
 
 	// use image with a Mat_ template
-	cv::Mat_<uchar> im2(image);
+	cv::Mat_<uchar> img(image);
 	
     //  or with references:
     //	cv::Mat_<uchar>& im2= reinterpret_cast<cv::Mat_<uchar>&>(image);
@@ -81,7 +81,7 @@ void salt2(cv::Mat image, int n) {
 		j = randomRow(generator);
 
 		// add salt
-		im2(j,i)= 255; 
+		img(j,i)= 255; 
 	}
 }
 
