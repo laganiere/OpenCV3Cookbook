@@ -7,9 +7,19 @@ cmake_minimum_required(VERSION 2.8)
 # add executable
 add_executable( saltImage saltImage.cpp)
 add_executable( colorReduce colorReduce.cpp)
+add_executable( contrast contrast.cpp)
+add_executable( addImages addImages.cpp)
+add_executable( remapping remapping.cpp)
 
 # link libraries
 target_link_libraries( saltImage ${OpenCV_LIBS})
 target_link_libraries( colorReduce ${OpenCV_LIBS})
+target_link_libraries( contrast ${OpenCV_LIBS})
+target_link_libraries( addImages ${OpenCV_LIBS})
+target_link_libraries( remapping ${OpenCV_LIBS})
 
-FILE(COPY ${CMAKE_SOURCE_DIR}/images/boldt.jpg DESTINATION .)
+# copy required images to every directory with executable
+SET (IMAGES ${CMAKE_SOURCE_DIR}/images/boldt.jpg)
+FILE(COPY ${IMAGES} DESTINATION .)
+FILE(COPY ${IMAGES} DESTINATION "Debug")
+FILE(COPY ${IMAGES} DESTINATION "Release")

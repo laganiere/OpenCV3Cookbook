@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 2 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 2 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #include <iostream>
@@ -38,8 +38,8 @@ void sharpen(const cv::Mat &image, cv::Mat &result) {
 
 		for (int i=nchannels; i<(image.cols-1)*nchannels; i++) {
 
+			// apply sharpening operator
 			*output++= cv::saturate_cast<uchar>(5*current[i]-current[i-nchannels]-current[i+nchannels]-previous[i]-next[i]); 
-//			output[i]= cv::saturate_cast<uchar>(5*current[i]-current[i-nchannels]-current[i+nchannels]-previous[i]-next[i]); 
 		}
 	}
 
@@ -54,11 +54,16 @@ void sharpen(const cv::Mat &image, cv::Mat &result) {
 // this one works only for gray-level image
 void sharpenIterator(const cv::Mat &image, cv::Mat &result) {
 
+	// must be a gray-level image
+	CV_Assert(image.type() == CV_8UC1);
+
+	// initialize iterators at row 1
 	cv::Mat_<uchar>::const_iterator it= image.begin<uchar>()+image.cols;
 	cv::Mat_<uchar>::const_iterator itend= image.end<uchar>()-image.cols;
 	cv::Mat_<uchar>::const_iterator itup= image.begin<uchar>();
 	cv::Mat_<uchar>::const_iterator itdown= image.begin<uchar>()+2*image.cols;
 
+	// setup output image and iterator
 	result.create(image.size(), image.type()); // allocate if necessary
 	cv::Mat_<uchar>::iterator itout= result.begin<uchar>()+result.cols;
 
@@ -67,7 +72,7 @@ void sharpenIterator(const cv::Mat &image, cv::Mat &result) {
 			*itout= cv::saturate_cast<uchar>(*it *5 - *(it-1)- *(it+1)- *itup - *itdown); 
 	}
 
-	// Set the unprocess pixels to 0
+	// Set the unprocessed pixels to 0
 	result.row(0).setTo(cv::Scalar(0));
 	result.row(result.rows-1).setTo(cv::Scalar(0));
 	result.col(0).setTo(cv::Scalar(0));
@@ -91,11 +96,11 @@ void sharpen2D(const cv::Mat &image, cv::Mat &result) {
 
 int main()
 {
+	// test sharpen function
+
 	cv::Mat image= cv::imread("boldt.jpg");
 	if (!image.data)
 		return 0; 
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
 	cv::Mat result;
 
@@ -107,10 +112,10 @@ int main()
 	cv::namedWindow("Image");
 	cv::imshow("Image",result);
 
+	// test sharpenIterator
+
     // open the image in gray-level
 	image= cv::imread("boldt.jpg",0);
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
 	time = static_cast<double>(cv::getTickCount());
 	sharpenIterator(image, result);
@@ -120,9 +125,9 @@ int main()
 	cv::namedWindow("Sharpened Image");
 	cv::imshow("Sharpened Image",result);
 
+	// test sharpen2D
+
 	image= cv::imread("boldt.jpg");
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
 	time = static_cast<double>(cv::getTickCount());
 	sharpen2D(image, result);

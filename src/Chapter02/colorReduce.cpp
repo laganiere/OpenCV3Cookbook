@@ -82,6 +82,7 @@ void colorReduce1(cv::Mat image, int div=64) {
 
       int nl= image.rows; // number of lines
       int nc= image.cols * image.channels(); // total number of elements per line
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for (int j=0; j<nl; j++) {
 
@@ -92,7 +93,7 @@ void colorReduce1(cv::Mat image, int div=64) {
             
 			  // process each pixel ---------------------
 
-			  *data++= *data/div*div + div/2;
+			  *data++= *data/div*div + div2;
 
 			  // end of pixel processing ----------------
 
@@ -106,6 +107,7 @@ void colorReduce2(cv::Mat image, int div=64) {
 
       int nl= image.rows; // number of lines
       int nc= image.cols * image.channels(); // total number of elements per line
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for (int j=0; j<nl; j++) {
 
@@ -116,7 +118,7 @@ void colorReduce2(cv::Mat image, int div=64) {
             // process each pixel ---------------------
 
                  int v= *data;
-                 *data++= v - v%div + div/2;
+                 *data++= v - v%div + div2;
 
             // end of pixel processing ----------------
 
@@ -133,18 +135,18 @@ void colorReduce3(cv::Mat image, int div=64) {
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
-      uchar div2= div>>1;
+      uchar div2= 1<<(n-1); // div2 = div/2
 
       for (int j=0; j<nl; j++) {
 
           uchar* data= image.ptr<uchar>(j);
 
-          for (int i=0; i<nc; i++) {
+		  for (int i = 0; i < nc; i++) {
 
-            // process each pixel ---------------------
+			  // process each pixel ---------------------
 
-            *data &= mask;     // masking
-            *data++ += div2;   // add div/2
+			  *data &= mask;     // masking
+			  *data++ |= div2;   // add div/2
 
             // end of pixel processing ----------------
 
@@ -163,7 +165,7 @@ void colorReduce4(cv::Mat image, int div=64) {
       int step= image.step; // effective width
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
-	  uchar div2 = div >> 1;
+	  uchar div2 = div >> 1; // div2 = div/2
 
       // get the pointer to the image buffer
       uchar *data= image.data;
@@ -203,7 +205,7 @@ void colorReduce5(cv::Mat image, int div=64) {
             // process each pixel ---------------------
 
             *data &= mask;
-            *data++ += div>>1;
+            *data++ += div/2;
 
             // end of pixel processing ----------------
 
@@ -220,7 +222,6 @@ void colorReduce6(cv::Mat image, int div=64) {
 
       if (image.isContinuous())  {
           // then no padded pixels
-          std::cout << "Image is continuous" << std::endl;
           nc= nc*nl;
           nl= 1;  // it is now a 1D array
        }
@@ -228,7 +229,10 @@ void colorReduce6(cv::Mat image, int div=64) {
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
+	  uchar div2 = div >> 1; // div2 = div/2
 
+     // this loop is executed only once
+     // in case of continuous images
       for (int j=0; j<nl; j++) {
 
           uchar* data= image.ptr<uchar>(j);
@@ -238,7 +242,7 @@ void colorReduce6(cv::Mat image, int div=64) {
             // process each pixel ---------------------
 
             *data &= mask;
-            *data++ += div>>1;
+            *data++ += div2;
 
             // end of pixel processing ----------------
 
@@ -263,6 +267,7 @@ void colorReduce7(cv::Mat image, int div=64) {
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for (int j=0; j<nl; j++) {
 
@@ -273,7 +278,7 @@ void colorReduce7(cv::Mat image, int div=64) {
             // process each pixel ---------------------
 
             *data &= mask;
-            *data++ += div>>1;
+            *data++ += div2;
 
             // end of pixel processing ----------------
 
@@ -288,14 +293,15 @@ void colorReduce8(cv::Mat image, int div=64) {
       // get iterators
       cv::Mat_<cv::Vec3b>::iterator it= image.begin<cv::Vec3b>();
       cv::Mat_<cv::Vec3b>::iterator itend= image.end<cv::Vec3b>();
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for ( ; it!= itend; ++it) {
 
         // process each pixel ---------------------
 
-        (*it)[0]= (*it)[0]/div*div + div/2;
-        (*it)[1]= (*it)[1]/div*div + div/2;
-        (*it)[2]= (*it)[2]/div*div + div/2;
+        (*it)[0]= (*it)[0]/div*div + div2;
+        (*it)[1]= (*it)[1]/div*div + div2;
+        (*it)[2]= (*it)[2]/div*div + div2;
 
         // end of pixel processing ----------------
       }
@@ -306,8 +312,8 @@ void colorReduce8(cv::Mat image, int div=64) {
 void colorReduce9(cv::Mat image, int div=64) {
 
       // get iterators
-      cv::Mat_<cv::Vec3b>::iterator it= image.begin<cv::Vec3b>();
-      cv::Mat_<cv::Vec3b>::iterator itend= image.end<cv::Vec3b>();
+      cv::MatIterator_<cv::Vec3b> it= image.begin<cv::Vec3b>();
+      cv::MatIterator_<cv::Vec3b> itend= image.end<cv::Vec3b>();
 
       const cv::Vec3b offset(div/2,div/2,div/2);
 
@@ -328,6 +334,7 @@ void colorReduce10(cv::Mat image, int div=64) {
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
+	  uchar div2 = div >> 1; // div2 = div/2
 
       // get iterators
       cv::Mat_<cv::Vec3b>::iterator it= image.begin<cv::Vec3b>();
@@ -339,11 +346,11 @@ void colorReduce10(cv::Mat image, int div=64) {
         // process each pixel ---------------------
 
         (*it)[0]&= mask;
-        (*it)[0]+= div>>1;
+        (*it)[0]+= div2;
         (*it)[1]&= mask;
-        (*it)[1]+= div>>1;
+        (*it)[1]+= div2;
         (*it)[2]&= mask;
-        (*it)[2]+= div>>1;
+        (*it)[2]+= div2;
 
         // end of pixel processing ----------------
       }
@@ -357,14 +364,15 @@ void colorReduce11(cv::Mat image, int div=64) {
       cv::Mat_<cv::Vec3b> cimage= image;
       cv::Mat_<cv::Vec3b>::iterator it=cimage.begin();
       cv::Mat_<cv::Vec3b>::iterator itend=cimage.end();
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for ( ; it!= itend; it++) {
 
         // process each pixel ---------------------
 
-        (*it)[0]= (*it)[0]/div*div + div/2;
-        (*it)[1]= (*it)[1]/div*div + div/2;
-        (*it)[2]= (*it)[2]/div*div + div/2;
+        (*it)[0]= (*it)[0]/div*div + div2;
+        (*it)[1]= (*it)[1]/div*div + div2;
+        (*it)[2]= (*it)[2]/div*div + div2;
 
         // end of pixel processing ----------------
       }
@@ -377,15 +385,16 @@ void colorReduce12(cv::Mat image, int div=64) {
 
       int nl= image.rows; // number of lines
       int nc= image.cols; // number of columns
+	  uchar div2 = div >> 1; // div2 = div/2
 
       for (int j=0; j<nl; j++) {
           for (int i=0; i<nc; i++) {
 
             // process each pixel ---------------------
 
-                  image.at<cv::Vec3b>(j,i)[0]=	 image.at<cv::Vec3b>(j,i)[0]/div*div + div/2;
-                  image.at<cv::Vec3b>(j,i)[1]=	 image.at<cv::Vec3b>(j,i)[1]/div*div + div/2;
-                  image.at<cv::Vec3b>(j,i)[2]=	 image.at<cv::Vec3b>(j,i)[2]/div*div + div/2;
+                  image.at<cv::Vec3b>(j,i)[0]=	 image.at<cv::Vec3b>(j,i)[0]/div*div + div2;
+                  image.at<cv::Vec3b>(j,i)[1]=	 image.at<cv::Vec3b>(j,i)[1]/div*div + div2;
+                  image.at<cv::Vec3b>(j,i)[2]=	 image.at<cv::Vec3b>(j,i)[2]/div*div + div2;
 
             // end of pixel processing ----------------
 
