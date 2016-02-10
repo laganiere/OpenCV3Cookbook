@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 2 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 2 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 
@@ -27,16 +27,13 @@ int main()
 	cv::Mat image1;
 	cv::Mat image2;
 
+	// open images
 	image1= cv::imread("boldt.jpg");
 	image2= cv::imread("rain.jpg");
 	if (!image1.data)
 		return 0; 
 	if (!image2.data)
 		return 0; 
-
-	// images ares resize for book printing
-	cv::resize(image1, image1, cv::Size(), 0.6, 0.6);
-	cv::resize(image2, image2, cv::Size(), 0.6, 0.6);
 
 	cv::namedWindow("Image 1");
 	cv::imshow("Image 1",image1);
@@ -57,8 +54,6 @@ int main()
 	cv::imshow("result with operators",result);
 
 	image2= cv::imread("rain.jpg",0);
-	// images ares resize for book printing
-	cv::resize(image2, image2, cv::Size(), 0.6, 0.6);
 
 	// create vector of 3 images
 	std::vector<cv::Mat> planes;

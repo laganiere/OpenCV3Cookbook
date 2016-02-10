@@ -79,6 +79,7 @@ void sharpenIterator(const cv::Mat &image, cv::Mat &result) {
 	result.col(result.cols-1).setTo(cv::Scalar(0));
 }
 
+// using kernel
 void sharpen2D(const cv::Mat &image, cv::Mat &result) {
 
 	// Construct kernel (all entries initialized to 0)
