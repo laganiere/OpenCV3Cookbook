@@ -32,5 +32,4 @@ Remapping an image
 
 You need the images:
 boldt.jpg
-image.jpg (any image will do)
 rain.jpg

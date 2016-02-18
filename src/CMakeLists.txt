@@ -25,4 +25,5 @@ message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
 # add Chapter02 projects
 add_subdirectory(Chapter02)
+add_subdirectory(Chapter03)
 
