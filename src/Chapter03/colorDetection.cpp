@@ -50,7 +50,14 @@ int main()
 	cv::imshow("result (functor)",result);
 
 	// testing floodfill
-	cv::floodFill(image, cv::Point(100, 50), cv::Scalar(230, 190, 130), (cv::Rect*)0, cv::Scalar(35, 35, 35), cv::Scalar(35, 35, 35), cv::FLOODFILL_FIXED_RANGE);
+	cv::floodFill(image,            // input/ouput image
+		cv::Point(100, 50),         // seed point
+		cv::Scalar(255, 255, 255),  // repainted color
+		(cv::Rect*)0,  // bounding rectangle of the repainted pixel set
+		cv::Scalar(35, 35, 35),     // low and high difference threshold
+		cv::Scalar(35, 35, 35),     // most of the time will be identical
+		cv::FLOODFILL_FIXED_RANGE); // pixels are compared to seed color
+
 	cv::namedWindow("Flood Fill result");
 	result = colordetector(image);
 	cv::imshow("Flood Fill result", image);

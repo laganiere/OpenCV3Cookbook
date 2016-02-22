@@ -1,7 +1,7 @@
-This directory contains material supporting chapter 3 of the cookbook:  
+This directory contains material supporting chapter 2 of the cookbook:  
 Computer Vision Programming using the OpenCV Library. 
-Second Edition
-by Robert Laganiere, Packt Publishing, 2013.
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
 Files:
 	colordetector.h
@@ -11,9 +11,9 @@ corresponds to Recipe:
 Using the Strategy Pattern in Algorithm Design
 
 File:
-	colorDetectController.cpp
+	extractObject.cpp
 correspond to Recipe:
-Using a Controller to communicate with processing modules 
+Segmenting an image with the GrabCut algorithm  
 
 File:
 	huesaturation.cpp

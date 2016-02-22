@@ -6,10 +6,12 @@ cmake_minimum_required(VERSION 2.8)
 
 # add executable
 add_executable( colorDetection colorDetection.cpp colordetector.cpp)
+add_executable( extractObject extractObject.cpp)
 add_executable( huesaturation huesaturation.cpp)
 
 # link libraries
 target_link_libraries( colorDetection ${OpenCV_LIBS})
+target_link_libraries( extractObject ${OpenCV_LIBS})
 target_link_libraries( huesaturation ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
