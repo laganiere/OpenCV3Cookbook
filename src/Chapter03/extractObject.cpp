@@ -50,11 +50,12 @@ int main()
 
 	// Get the pixels marked as likely foreground
 	cv::compare(result,cv::GC_PR_FGD,result,cv::CMP_EQ);
-//	result= result&1;
+	// or:
+    //	result= result&1;
 
 	// create a white image
 	cv::Mat foreground(image.size(), CV_8UC3,
-		cv::Scalar(255, 255, 255));
+	          	       cv::Scalar(255, 255, 255));
 
 	image.copyTo(foreground,result); // bg pixels not copied
 

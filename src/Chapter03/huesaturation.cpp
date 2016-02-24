@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 3 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 2 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #include <opencv2/core/core.hpp>
@@ -128,6 +128,21 @@ int main()
 
 	cv::namedWindow("Fixed saturation/value");
 	cv::imshow("Fixed saturation/value",newImage);
+
+	// artificial image shown the all possible HS colors
+	cv::Mat hs(128, 360, CV_8UC3);  
+	for (int h = 0; h < 360; h++) {
+		for (int s = 0; s < 128; s++) {
+			hs.at<cv::Vec3b>(s, h)[0] = h/2;     // all hue angles
+			hs.at<cv::Vec3b>(s, h)[1] = 255-s*2; // from high saturation to low
+			hs.at<cv::Vec3b>(s, h)[2] = 255;     // constant value
+		}
+	}
+
+	cv::cvtColor(hs, newImage, CV_HSV2BGR);
+
+	cv::namedWindow("Hue/Saturation");
+	cv::imshow("Hue/Saturation", newImage);
 
 	// Testing skin detection
 
