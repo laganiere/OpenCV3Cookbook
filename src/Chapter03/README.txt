@@ -1,4 +1,4 @@
-This directory contains material supporting chapter 2 of the cookbook:  
+This directory contains material supporting chapter 3 of the cookbook:  
 Computer Vision Programming using the OpenCV Library. 
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.

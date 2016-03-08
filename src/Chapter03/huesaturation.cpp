@@ -40,7 +40,7 @@ void detectHScolor(const cv::Mat& image,		// input image
 	// channels[2] is the Value
 
 	// Hue masking
-	cv::Mat mask1; // under maxHue
+	cv::Mat mask1; // below maxHue
 	cv::threshold(channels[0], mask1, maxHue, 255, cv::THRESH_BINARY_INV);
 	cv::Mat mask2; // over minHue
 	cv::threshold(channels[0], mask2, minHue, 255, cv::THRESH_BINARY);
@@ -52,7 +52,7 @@ void detectHScolor(const cv::Mat& image,		// input image
 		hueMask = mask1 | mask2;
 
 	// Saturation masking
-	// under maxSat
+	// below maxSat
 	cv::threshold(channels[1], mask1, maxSat, 255, cv::THRESH_BINARY_INV);
 	// over minSat
 	cv::threshold(channels[1], mask2, minSat, 255, cv::THRESH_BINARY);
