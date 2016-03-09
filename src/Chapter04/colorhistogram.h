@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 4 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 4 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #if !defined COLHISTOGRAM
@@ -27,7 +27,7 @@ class ColorHistogram {
   private:
 
     int histSize[3];        // size of each dimension
-	float hranges[2];       // range of values
+	float hranges[2];       // range of values (same for the 3 dimensions)
     const float* ranges[3]; // array of ranges for each dimension
     int channels[3];        // channel to be considered
 
@@ -43,9 +43,9 @@ class ColorHistogram {
 		ranges[0]= hranges; // in this class,  
 		ranges[1]= hranges; // all channels have the same range
 		ranges[2]= hranges; 
-		channels[0]= 0;		// the three channels 
-		channels[1]= 1; 
-		channels[2]= 2; 
+		channels[0]= 0;		// the three channels: B
+		channels[1]= 1;     // G
+		channels[2]= 2;     // R
 	}
 
 	// set histogram size for each dimension
