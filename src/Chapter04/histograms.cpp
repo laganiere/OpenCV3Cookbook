@@ -89,18 +89,21 @@ int main()
 	cv::imshow("Stretched Image",str);
 
 	// Show the new histogram
-	cv::namedWindow("Stretched Histogram");
-	cv::imshow("Stretched Histogram",h.getHistogramImage(str));
+	cv::namedWindow("Stretched H");
+	cv::imshow("Stretched H",h.getHistogramImage(str));
 
 	// Create an image inversion table
-	int dim(256);
-	cv::Mat lut(1,  // 1 dimension
-		&dim,       // 256 entries
-		CV_8U);     // uchar
-	// or cv::Mat lut(256,1,CV_8U);
+	cv::Mat lut(256,1,CV_8U); // 256x1 matrix
+
+	// Or:
+	// int dim(256);
+	// cv::Mat lut(1,  // 1 dimension
+	// 	&dim,          // 256 entries
+	//	CV_8U);        // uchar
 
 	for (int i=0; i<256; i++) {
 		
+		// 0 becomes 255, 1 becomes 254, etc.
 		lut.at<uchar>(i)= 255-i;
 	}
 

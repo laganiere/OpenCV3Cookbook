@@ -172,14 +172,14 @@ class Histogram1D {
 
         // find left extremity of the histogram
         int imin = 0;
-        for (float count=0.0; imin < histSize[0]; imin++) {
+        for (float count=0.0; imin < 256; imin++) {
             // number of pixel at imin and below must be > number
             if ((count+=hist.at<float>(imin)) >= number)
                 break;
         }
 
         // find right extremity of the histogram
-        int imax = histSize[0] - 1;
+        int imax = 255;
         for (float count=0.0; imax >= 0; imax--) {
             // number of pixel at imax and below must be > number
             if ((count += hist.at<float>(imax)) >= number)
