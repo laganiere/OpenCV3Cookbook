@@ -19,7 +19,7 @@ target_link_libraries( retrieve ${OpenCV_LIBS})
 target_link_libraries( tracking ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
-SET (IMAGES ${CMAKE_SOURCE_DIR}/images/group.jpg)
+SET (IMAGES ${CMAKE_SOURCE_DIR}/images/group.jpg ${CMAKE_SOURCE_DIR}/images/waves2.jpg)
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")
 FILE(COPY ${IMAGES} DESTINATION "Release")

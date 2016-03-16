@@ -78,8 +78,8 @@ int main()
 	cv::imshow("Equalized Image",eq);
 
 	// Show the new histogram
-	cv::namedWindow("Equalized Histogram");
-	cv::imshow("Equalized Histogram",h.getHistogramImage(eq));
+	cv::namedWindow("Equalized H");
+	cv::imshow("Equalized H",h.getHistogramImage(eq));
 
 	// Stretch the image, setting the 1% of pixels at black and 1% at white
 	cv::Mat str= h.stretch(image,0.01f);
@@ -93,7 +93,7 @@ int main()
 	cv::imshow("Stretched H",h.getHistogramImage(str));
 
 	// Create an image inversion table
-	cv::Mat lut(256,1,CV_8U); // 256x1 matrix
+	cv::Mat lut(1,256,CV_8U); // 1x256 matrix
 
 	// Or:
 	// int dim(256);
