@@ -109,7 +109,7 @@ class ColorHistogram {
 		return hist;
 	}
 
-	// Computes the 1D Hue histogram with a mask.
+	// Computes the 1D Hue histogram.
 	// BGR source image is converted to HSV
 	// Pixels with low saturation are ignored
 	cv::Mat getHueHistogram(const cv::Mat &image, 
@@ -123,7 +123,7 @@ class ColorHistogram {
 
 		// Mask to be used (or not)
 		cv::Mat mask;
-
+		// creating the mask if required
 		if (minSaturation>0) {
 		
 			// Spliting the 3 channels into 3 images

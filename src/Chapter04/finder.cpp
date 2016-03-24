@@ -30,20 +30,21 @@ using namespace std;
 int main()
 {
 	// Read reference image
-	cv::Mat image= cv::imread("baboon1.jpg");
+	cv::Mat image= cv::imread("baboon01.jpg");
 	if (!image.data)
 		return 0; 
 
-	// Define ROI
-	cv::Mat imageROI= image(cv::Rect(110,260,35,40));
-	cv::rectangle(image, cv::Rect(110,260,35,40),cv::Scalar(0,0,255));
+	// initial window position
+	cv::Rect rect(110, 45, 35, 45);
+	cv::rectangle(image, rect, cv::Scalar(0, 0, 255));
 
-	// Display image (just half of it)
-	cv::Mat window(image, cv::Rect(0, 2*image.rows/5, image.cols, image.rows/2));
-	cv::namedWindow("Image");
-	cv::imshow("Image",window);
+	// Baboon's face ROI
+	cv::Mat imageROI = image(rect);
 
-	// Get the Hue histogram
+	cv::namedWindow("Image 1");
+	cv::imshow("Image 1",image);
+
+	// Get the Hue histogram of the Baboon's face
 	int minSat=65;
 	ColorHistogram hc;
 	cv::Mat colorhist= hc.getHueHistogram(imageROI,minSat);
@@ -67,12 +68,10 @@ int main()
 
 	//--------------
 	// Second image
-	image= cv::imread("baboon3.jpg");
+	image= cv::imread("baboon02.jpg");
 
-	// Display image (just half of it)
-	cv::Mat window2(image, cv::Rect(0, 2 * image.rows / 5, image.cols, image.rows / 2));
 	cv::namedWindow("Image 2");
-	cv::imshow("Image 2",window2);
+	cv::imshow("Image 2",image);
 
 	// Convert to HSV space
 	cv::cvtColor(image, hsv, CV_BGR2HSV);
@@ -87,20 +86,20 @@ int main()
 	cv::imshow("Backprojection on second image",result);
 
 	// initial window position
-	cv::Rect rect(110,260,35,40);
 	cv::rectangle(image, rect, cv::Scalar(0,0,255));
 
 	// search objet with mean shift
-	cv::TermCriteria criteria(cv::TermCriteria::MAX_ITER,10,0.01);
+	cv::TermCriteria criteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS,
+		10,     // iterate max 10 times
+		1);     // or until the change in centroid position is less than 1px
 	cout << "meanshift= " << cv::meanShift(result,rect,criteria) << endl;
 
 	// draw output window
 	cv::rectangle(image, rect, cv::Scalar(0,255,0));
 
 	// Display image
-	cv::Mat window2r(image, cv::Rect(0, 2 * image.rows / 5, image.cols, image.rows / 2));
 	cv::namedWindow("Image 2 result");
-	cv::imshow("Image 2 result",window2r);
+	cv::imshow("Image 2 result",image);
 
 	cv::waitKey();
 	return 0;

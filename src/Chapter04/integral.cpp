@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 4 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 4 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 #include <iostream>
 
@@ -84,27 +84,53 @@ int main()
 
 	// for each row
 	int halfSize= blockSize/2;
-    for (int j=halfSize; j<nl-halfSize-1; j++) {
+	for (int j = halfSize; j<nl - halfSize - 1; j++) {
 
-		  // get the address of row j
-		  uchar* data= binary.ptr<uchar>(j);
-		  int* idata1= iimage.ptr<int>(j-halfSize);
-		  int* idata2= iimage.ptr<int>(j+halfSize+1);
+		// get the address of row j
+		uchar* data = binary.ptr<uchar>(j);
+		int* idata1 = iimage.ptr<int>(j - halfSize);
+		int* idata2 = iimage.ptr<int>(j + halfSize + 1);
 
-		  // for pixel of a line
-          for (int i=halfSize; i<nc-halfSize-1; i++) {
- 
-			  // compute sum
-			  int sum= (idata2[i+halfSize+1]-idata2[i-halfSize]-
-				        idata1[i+halfSize+1]+idata1[i-halfSize])/(blockSize*blockSize);
+		// for pixel of a line
+		for (int i = halfSize; i<nc - halfSize - 1; i++) {
 
-			  // apply adaptive threshold
-			  if (data[i]<(sum-threshold))
-				  data[i]= 0;
-			  else
-				  data[i]=255;
-          }                    
-    }
+			// compute sum
+			int sum = (idata2[i + halfSize + 1] - idata2[i - halfSize] -
+				idata1[i + halfSize + 1] + idata1[i - halfSize]) / (blockSize*blockSize);
+
+			// apply adaptive threshold
+			if (data[i]<(sum - threshold))
+				data[i] = 0;
+			else
+				data[i] = 255;
+		}
+	}
+
+	// add white border
+	for (int j = 0; j<halfSize; j++) {
+		uchar* data = binary.ptr<uchar>(j);
+
+		for (int i = 0; i<binary.cols; i++) {
+			data[i] = 255;
+		}
+	}
+	for (int j = binary.rows - halfSize-1; j<binary.rows; j++) {
+		uchar* data = binary.ptr<uchar>(j);
+
+		for (int i = 0; i<binary.cols; i++) {
+			data[i] = 255;
+		}
+	}
+	for (int j = halfSize; j<nl - halfSize - 1; j++) {
+		uchar* data = binary.ptr<uchar>(j);
+
+		for (int i = 0; i<halfSize; i++) {
+			data[i] = 255;
+		}
+		for (int i = binary.cols-halfSize-1; i<binary.cols; i++) {
+			data[i] = 255;
+		}
+	}
 
 	time= cv::getTickCount()-time;
 	std::cout << "time integral= " << time << std::endl; 
@@ -116,9 +142,10 @@ int main()
 	time= cv::getTickCount();
 	cv::Mat filtered;
 	cv::Mat binaryFiltered;
+	// box filter compute avg of pixels over a rectangular region
 	cv::boxFilter(image,filtered,CV_8U,cv::Size(blockSize,blockSize));
-	filtered= filtered-threshold;
-	binaryFiltered= image>= filtered;
+	// check if pixel greater than (mean + threshold)
+	binaryFiltered= image>= (filtered-threshold);
 	time= cv::getTickCount()-time;
 
 	std::cout << "time filtered= " << time << std::endl; 

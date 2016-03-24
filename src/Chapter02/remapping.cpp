@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------*\
-This file contains material supporting chapter 2 of the book:
+This file contains material supporting chapter 4 of the book:
 OpenCV3 Computer Vision Application Programming Cookbook
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.

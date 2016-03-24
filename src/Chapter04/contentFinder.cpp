@@ -29,7 +29,7 @@ using namespace std;
 int main()
 {
 	// Read input image
-    cv::Mat image= cv::imread("waves2.jpg",0);
+    cv::Mat image= cv::imread("waves.jpg",0);
 	if (!image.data)
 		return 0; 
 
@@ -81,7 +81,7 @@ int main()
 
 	// Load color image
 	ColorHistogram hc;
-    cv::Mat color= cv::imread("waves2.jpg");
+    cv::Mat color= cv::imread("waves.jpg");
 
 	// extract region of interest
 	imageROI= color(cv::Rect(0,0,100,45)); // blue sky area
