@@ -1,24 +1,24 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 5 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 5 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2\core.hpp>
+#include <opencv2\imgproc.hpp>
+#include <opencv2\highgui.hpp>
 #include "morphoFeatures.h"
 
 int main()
@@ -27,8 +27,6 @@ int main()
 	cv::Mat image= cv::imread("building.jpg",0);
 	if (!image.data)
 		return 0; 
-	// resize for book printing
-	cv::resize(image, image, cv::Size(), 0.7, 0.7);
 
     // Display the image
 	cv::namedWindow("Image");
@@ -50,7 +48,7 @@ int main()
     morpho.setThreshold(-1);
 	cv::Mat corners;
 	corners= morpho.getCorners(image);
-	cv::morphologyEx(corners,corners,cv::MORPH_TOPHAT,cv::Mat());
+//	cv::morphologyEx(corners,corners,cv::MORPH_TOPHAT,cv::Mat());
     cv::threshold(corners, corners, 35, 255, cv::THRESH_BINARY_INV);
 
     // Display the corner image
@@ -62,8 +60,26 @@ int main()
 	cv::namedWindow("Corners on Image");
 	cv::imshow("Corners on Image",image);
 
+	// TEST
+	image = cv::imread("book.jpg", 0);
+	if (!image.data)
+		return 0;
+	cv::namedWindow("th Image1");
+	cv::imshow("th Image1", image);
+	cv::Mat element7(7, 7, CV_8U, cv::Scalar(1));
+	cv::Mat test;
+	cv::morphologyEx(image, test, cv::MORPH_CLOSE, element7);
+	cv::namedWindow("th ImageC");
+	cv::imshow("th ImageC", test);
+	cv::morphologyEx(image, image, cv::MORPH_BLACKHAT, cv::Mat());
+	cv::threshold(image, image, 10, 255, cv::THRESH_BINARY_INV);
+	cv::namedWindow("th Image");
+	cv::imshow("th Image", image);
+
 	// Read and display image of square
 	image= cv::imread("square.bmp",0);
+	if (!image.data)
+		return 0;
 	cv::namedWindow("Square Image");
 	cv::imshow("Square Image",image);
 

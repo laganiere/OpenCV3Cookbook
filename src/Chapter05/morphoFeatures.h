@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 5 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 5 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #if !defined MORPHOF
@@ -79,16 +79,20 @@ class MorphoFeatures {
 			  1, 1, 1, 1, 1;
 	  }
 
+	  // set threshold for binarization
+	  // -1 means no thresholding
 	  void setThreshold(int t) {
 
 		  threshold= t;
 	  }
 
+	  // get the threshold value
 	  int getThreshold() const {
 
 		  return threshold;
 	  }
 
+	  // get edges using Beucher
 	  cv::Mat getEdges(const cv::Mat &image) {
 
 		  // Get the gradient image
@@ -101,6 +105,7 @@ class MorphoFeatures {
 		  return result;
 	  }
 
+	  // get morphological corners
 	  cv::Mat getCorners(const cv::Mat &image) {
 
 		  cv::Mat result;
@@ -128,6 +133,7 @@ class MorphoFeatures {
 		  return result;
 	  }
 
+	  // draw circles at corner locations
 	  void drawOnImage(const cv::Mat& binary, cv::Mat& image) {
 		  	  
 		  cv::Mat_<uchar>::const_iterator it= binary.begin<uchar>();

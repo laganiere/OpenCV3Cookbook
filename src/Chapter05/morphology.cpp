@@ -32,7 +32,8 @@ int main()
 	cv::imshow("Image",image);
 
 	// Erode the image
-	cv::Mat eroded;
+	// with the default 3x3 structuring element (SE)
+	cv::Mat eroded; // the destination image
 	cv::erode(image,eroded,cv::Mat());
 
     // Display the eroded image
@@ -40,15 +41,17 @@ int main()
 	cv::imshow("Eroded Image",eroded);
 
 	// Dilate the image
-	cv::Mat dilated;
+	cv::Mat dilated; // the destination image
 	cv::dilate(image,dilated,cv::Mat());
 
-    // Display the dialted image
+    // Display the dilated image
 	cv::namedWindow("Dilated Image");
 	cv::imshow("Dilated Image",dilated);
 
-	// Erode the image with a larger s.e.
+	// Erode the image with a larger SE
+	// create a 7x7 mat with containing all 1s
 	cv::Mat element(7,7,CV_8U,cv::Scalar(1));
+	// erode the image with that SE
 	cv::erode(image,eroded,element);
 
     // Display the eroded image
@@ -65,9 +68,11 @@ int main()
 	// Close the image
 	cv::Mat element5(5,5,CV_8U,cv::Scalar(1));
 	cv::Mat closed;
-	cv::morphologyEx(image,closed,cv::MORPH_CLOSE,element5);
+	cv::morphologyEx(image,closed,    // input and output images
+		             cv::MORPH_CLOSE, // operator code
+		             element5);       // structuring element
 
-    // Display the opened image
+    // Display the closed image
 	cv::namedWindow("Closed Image");
 	cv::imshow("Closed Image",closed);
 
@@ -79,13 +84,24 @@ int main()
 	cv::namedWindow("Opened Image");
 	cv::imshow("Opened Image",opened);
 
+	// explicit closing
+	// 1. dilate original image
+	cv::Mat result;
+	cv::dilate(image, result, element5);
+	// 2. in-place erosion of the dilated image
+	cv::erode(result, result, element5);
+
+	// Display the closed image
+	cv::namedWindow("Closed Image (2)");
+	cv::imshow("Closed Image (2)", result);
+
 	// Close and Open the image
 	cv::morphologyEx(image,image,cv::MORPH_CLOSE,element5);
 	cv::morphologyEx(image,image,cv::MORPH_OPEN,element5);
 
     // Display the close/opened image
-	cv::namedWindow("Closed and Opened Image");
-	cv::imshow("Closed and Opened Image",image);
+	cv::namedWindow("Closed|Opened Image");
+	cv::imshow("Closed|Opened Image",image);
 	cv::imwrite("binaryGroup.bmp",image);
 
 	// Read input image
@@ -96,8 +112,72 @@ int main()
 	cv::morphologyEx(image,image,cv::MORPH_CLOSE,element5);
 
     // Display the close/opened image
-	cv::namedWindow("Opened and Closed Image");
-	cv::imshow("Opened and Closed Image",image);
+	cv::namedWindow("Opened|Closed Image");
+	cv::imshow("Opened|Closed Image",image);
+
+	// Read input image (gray-level)
+	image = cv::imread("boldt.jpg",0);
+	if (!image.data)
+		return 0;
+
+	// Get the gradient image using a 3x3 structuring element
+	cv::morphologyEx(image, result, cv::MORPH_GRADIENT, cv::Mat());
+
+	// Display the morphological edge image
+	cv::namedWindow("Edge Image");
+	cv::imshow("Edge Image", 255 - result);
+
+	// Apply threshold to obtain a binary image
+	int threshold(80);
+	cv::threshold(result, result,
+					threshold, 255, cv::THRESH_BINARY);
+
+	// Display the close/opened image
+	cv::namedWindow("Thresholded Edge Image");
+	cv::imshow("Thresholded Edge Image", result);
+
+	// Get the gradient image using a 3x3 structuring element
+	cv::morphologyEx(image, result, cv::MORPH_GRADIENT, cv::Mat());
+
+	// Read input image (gray-level)
+	image = cv::imread("book.jpg", 0);
+	if (!image.data)
+		return 0;
+	// rotate the image for easier display
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
+
+	// Apply the black top-hat transform using a 3x3 structuring element
+	cv::morphologyEx(image, result, cv::MORPH_BLACKHAT, cv::Mat());
+
+	// Display the black top hat transform image
+	cv::namedWindow("Black Top-hat Image");
+	cv::imshow("Black Top-hat Image", 255-result);
+
+
+	// Apply the top-hat transform using a 3x3 structuring element
+	cv::morphologyEx(image, result, cv::MORPH_TOPHAT, cv::Mat());
+
+	// Display the top-hat tranform image
+	cv::namedWindow("Top-hat Image");
+	cv::imshow("Top-hat Image", 255-result);
+
+	// Apply the black top-hat transform using a 7x7 structuring element
+	cv::Mat element7(7, 7, CV_8U, cv::Scalar(1));
+	cv::morphologyEx(image, result, cv::MORPH_BLACKHAT, element);
+
+	// Display the morphologicsl edge image
+	cv::namedWindow("7x7 Black Top-hat Image");
+	cv::imshow("7x7 Black Top-hat Image", 255-result);
+
+	// Apply threshold to obtain a binary image
+	threshold= 25;
+	cv::threshold(result, result,
+		threshold, 255, cv::THRESH_BINARY);
+
+	// Display the morphological edge image
+	cv::namedWindow("Thresholded Black Top-hat");
+	cv::imshow("Thresholded Black Top-hat", 255 - result);
 
 	cv::waitKey();
 	return 0;
