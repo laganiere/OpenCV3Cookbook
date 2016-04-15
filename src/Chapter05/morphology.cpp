@@ -147,26 +147,11 @@ int main()
 	cv::transpose(image, image);
 	cv::flip(image, image, 0);
 
-	// Apply the black top-hat transform using a 3x3 structuring element
-	cv::morphologyEx(image, result, cv::MORPH_BLACKHAT, cv::Mat());
-
-	// Display the black top hat transform image
-	cv::namedWindow("Black Top-hat Image");
-	cv::imshow("Black Top-hat Image", 255-result);
-
-
-	// Apply the top-hat transform using a 3x3 structuring element
-	cv::morphologyEx(image, result, cv::MORPH_TOPHAT, cv::Mat());
-
-	// Display the top-hat tranform image
-	cv::namedWindow("Top-hat Image");
-	cv::imshow("Top-hat Image", 255-result);
-
 	// Apply the black top-hat transform using a 7x7 structuring element
 	cv::Mat element7(7, 7, CV_8U, cv::Scalar(1));
-	cv::morphologyEx(image, result, cv::MORPH_BLACKHAT, element);
+	cv::morphologyEx(image, result, cv::MORPH_BLACKHAT, element7);
 
-	// Display the morphologicsl edge image
+	// Display the top-hat image
 	cv::namedWindow("7x7 Black Top-hat Image");
 	cv::imshow("7x7 Black Top-hat Image", 255-result);
 
@@ -178,6 +163,13 @@ int main()
 	// Display the morphological edge image
 	cv::namedWindow("Thresholded Black Top-hat");
 	cv::imshow("Thresholded Black Top-hat", 255 - result);
+
+	// Apply the black top-hat transform using a 7x7 structuring element
+	cv::morphologyEx(image, result, cv::MORPH_CLOSE, element7);
+
+	// Display the top-hat image
+	cv::namedWindow("7x7 Closed Image");
+	cv::imshow("7x7 Closed Image", 255 - result);
 
 	cv::waitKey();
 	return 0;
