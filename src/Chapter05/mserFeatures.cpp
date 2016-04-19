@@ -55,7 +55,7 @@ int main()
 	cv::Mat output(image.size(),CV_8UC3);
 	output= cv::Scalar(255,255,255);
 	
-	// random number generator
+	// OpenCV random number generator
 	cv::RNG rng;
 
 	// Display the MSERs in color areas
@@ -88,11 +88,11 @@ int main()
 	cv::imwrite("mser.bmp", output);
 
 	// Extract and display the rectangular MSERs
-	// for each detected feature
 	std::vector<cv::Rect>::iterator itr = rects.begin();
 	std::vector<std::vector<cv::Point> >::iterator itp = points.begin();
 	for (; itr != rects.end(); ++itr, ++itp) {
 
+		// ratio test
 		if (static_cast<double>(itp->size())/itr->area() > 0.6)
 			cv::rectangle(image, *itr, cv::Scalar(255), 2);
 	}
@@ -106,8 +106,7 @@ int main()
 	if (!image.data)
 		return 0;
 
-	// Display the elliptic MSERs
-	// for each detected feature
+	// Extract and display the elliptic MSERs
 	for (std::vector<std::vector<cv::Point> >::iterator it = points.begin();
 	                                                    it != points.end(); ++it) {
 
@@ -117,7 +116,7 @@ int main()
 
 			// Extract bouding rectangles
 			cv::RotatedRect rr = cv::minAreaRect(*it);
-
+            // check ellipse elongation
 			if (rr.size.height / rr.size.height > 0.6 || rr.size.height / rr.size.height < 1.6)
 				cv::ellipse(image, rr, cv::Scalar(255), 2);
 		}
