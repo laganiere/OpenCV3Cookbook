@@ -8,12 +8,7 @@ File:
 correspond to Recipes:
 Eroding and Dilating Images using Morphological Filters
 Opening and Closing Images using Morphological Filters
-
-Files:
-	morpho2.cpp
-	morphoFeatures.h
-correspond to Recipe:
-Detecting edges and corners using morphological filters
+Applying Morphological Filters on gray-level images
 
 Files:
 	mserFeature.cpp
@@ -31,6 +26,6 @@ Extracting foreground objects with the GrabCut algorithm
 You need the images:
 building.jpg
 binary.bmp
+book.jpg
 group.jpg
 tower.jpg
-square.bmp

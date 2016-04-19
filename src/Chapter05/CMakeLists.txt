@@ -6,10 +6,12 @@ cmake_minimum_required(VERSION 2.8)
 
 # add executable
 add_executable( morphology morphology.cpp)
+add_executable( segment segment.cpp)
 add_executable( mserFeatures mserFeatures.cpp)
 
 # link libraries
 target_link_libraries( morphology ${OpenCV_LIBS})
+target_link_libraries( segment ${OpenCV_LIBS})
 target_link_libraries( mserFeatures ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
