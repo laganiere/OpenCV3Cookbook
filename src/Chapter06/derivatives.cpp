@@ -1,26 +1,26 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 6 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 6 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #include <iostream>
 #include <iomanip>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include "laplacianZC.h"
 
 int main()
@@ -29,8 +29,6 @@ int main()
 	cv::Mat image= cv::imread("boldt.jpg",0);
 	if (!image.data)
 		return 0; 
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
     // Display the image
 	cv::namedWindow("Original Image");
@@ -114,6 +112,7 @@ int main()
 	cv::namedWindow("Binary Sobel Image (high)");
 	cv::imshow("Binary Sobel Image (high)",sobelThresholded);
 
+
 	// Compute Laplacian 3x3
 	cv::Mat laplace;
 	cv::Laplacian(image,laplace,CV_8U,1,1,128);
@@ -122,32 +121,11 @@ int main()
 	cv::namedWindow("Laplacian Image");
 	cv::imshow("Laplacian Image",laplace);
 
-	// Print window pixel values
-	for (int i=0; i<12; i++) {
-		for (int j=0; j<12; j++)
-			std::cout << std::setw(5) << static_cast<int>(laplace.at<uchar>(i+79, j+215)) - 128 << " ";
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
-
-	// Compute Laplacian 7x7
-	cv::Laplacian(image,laplace,CV_8U,7,0.01,128);
-
-    // Display the image 
-	cv::namedWindow("Laplacian Image");
-	cv::imshow("Laplacian Image",laplace);
-
-	// Print window pixel values
-	for (int i=0; i<12; i++) {
-		for (int j=0; j<12; j++)
-			std::cout << std::setw(5) << static_cast<int>(laplace.at<uchar>(i+79, j+215)) - 128 << " ";
-		std::cout << std::endl;
-	}
-
+	int cx(238), cy(90);
+	int dx(12), dy(12);
+	
     // Extract small window
-	cv::Mat window(image,cv::Rect(215,79,12,12));
+	cv::Mat window(image,cv::Rect(cx,cy,dx,dy));
 	cv::namedWindow("Image window");
 	cv::imshow("Image window",window);
 	cv::imwrite("window.bmp",window);
@@ -160,18 +138,28 @@ int main()
 	// display min max values of the lapalcian
 	double lapmin, lapmax;
 	cv::minMaxLoc(flap,&lapmin,&lapmax);
-	std::cout << "Laplacian value range=[" << lapmin << "," << lapmax << "]\n";
 
 	// display laplacian image
 	laplace= laplacian.getLaplacianImage();
 	cv::namedWindow("Laplacian Image (7x7)");
 	cv::imshow("Laplacian Image (7x7)",laplace);
 
-	// Print Laplacian values
+	// Print image values
 	std::cout << std::endl;
-	for (int i=0; i<12; i++) {
-		for (int j=0; j<12; j++)
-			std::cout << std::setw(5) << static_cast<int>(flap.at<float>(i+79, j+215) / 100) << " ";
+	std::cout << "Image values:\n\n";
+	for (int i = 0; i<dx; i++) {
+		for (int j = 0; j<dy; j++)
+			std::cout << std::setw(5) << static_cast<int>(image.at<uchar>(i + cy, j + cx)) << " ";
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	// Print Laplacian values
+	std::cout << "Laplacian value range=[" << lapmin << "," << lapmax << "]\n";
+	std::cout << std::endl;
+	for (int i=0; i<dx; i++) {
+		for (int j=0; j<dy; j++)
+			std::cout << std::setw(5) << static_cast<int>(flap.at<float>(i + cy, j + cx) / 100) << " ";
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
@@ -183,9 +171,10 @@ int main()
 	cv::imshow("Zero-crossings",255-zeros);
 
 	// Print window pixel values
-	for (int i=0; i<12; i++) {
-		for (int j=0; j<12; j++)
-			std::cout << std::setw(2) << static_cast<int>(zeros.at<uchar>(i+79, j+215)) << " ";
+	std::cout << "Zero values:\n\n";
+	for (int i=0; i<dx; i++) {
+		for (int j=0; j<dy; j++)
+			std::cout << std::setw(2) << static_cast<int>(zeros.at<uchar>(i + cy, j + cx))/255 << " ";
 		std::cout << std::endl;
 	}
 	
@@ -242,7 +231,7 @@ int main()
 	cv::imshow("Zero-crossings of DoG",255-zeros);
 
     // Display the image with window
-	cv::rectangle(image,cv::Point(214,80),cv::Point(226,92),cv::Scalar(255,255,255));
+	cv::rectangle(image,cv::Rect(cx,cy,dx,dy),cv::Scalar(255,255,255));
 	cv::namedWindow("Original Image with window");
 	cv::imshow("Original Image with window",image);
 

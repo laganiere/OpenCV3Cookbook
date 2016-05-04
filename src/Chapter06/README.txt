@@ -7,6 +7,7 @@ File:
 	filters.cpp
 correspond to Recipes:
 Filtering Images using Low-pass Filters
+Resampling Images with filters
 Filtering Images using a Median Filter
 
 Files:
@@ -15,6 +16,10 @@ Files:
 correspond to Recipes:
 Applying Directional Filters to Detect Edges
 Computing the Laplacian of an Image
+
+File:
+	hog.cpp
+Describing images with histograms of oriented gradients
 
 You need the images:
 boldt.jpg
