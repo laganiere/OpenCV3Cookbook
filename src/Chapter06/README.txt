@@ -1,4 +1,4 @@
-This directory contains material supporting chapter 5 of the cookbook:  
+This directory contains material supporting chapter 6 of the cookbook:  
 Computer Vision Programming using the OpenCV Library. 
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
@@ -16,10 +16,6 @@ Files:
 correspond to Recipes:
 Applying Directional Filters to Detect Edges
 Computing the Laplacian of an Image
-
-File:
-	hog.cpp
-Describing images with histograms of oriented gradients
 
 You need the images:
 boldt.jpg
