@@ -23,8 +23,6 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/imgproc.hpp>
 #include <vector>
 
-//#include "mserFeatures.h"
-
 int main()
 {
 	// Read input image

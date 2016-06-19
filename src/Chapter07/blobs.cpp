@@ -1,26 +1,27 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 7 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 7 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
+
 
 #include <iostream>
 #include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 
 int main()
 {
@@ -36,8 +37,8 @@ int main()
     std::vector<std::vector<cv::Point> > contours;
 	cv::findContours(image, 
 		contours, // a vector of contours 
-		CV_RETR_EXTERNAL, // retrieve the external contours
-		CV_CHAIN_APPROX_NONE); // retrieve all pixels of each contours
+		cv::RETR_EXTERNAL,      // retrieve the external contours
+		cv::CHAIN_APPROX_NONE); // retrieve all pixels of each contours
 
 	// Print contours' length
 	std::cout << "Contours: " << contours.size() << std::endl;
@@ -59,7 +60,7 @@ int main()
 
 	// Eliminate too short or too long contours
 	int cmin= 50;  // minimum contour length
-	int cmax= 1000; // maximum contour length
+	int cmax= 500; // maximum contour length
     std::vector<std::vector<cv::Point> >::iterator itc= contours.begin();
 	while (itc!=contours.end()) {
 
@@ -71,8 +72,6 @@ int main()
 
 	// draw contours on the original image
 	cv::Mat original= cv::imread("group.jpg");
-	// image is resize for book printing
-	cv::resize(original, original, cv::Size(), 0.7, 0.7);
 
 	cv::drawContours(original,contours,
 		-1, // draw all contours
@@ -139,14 +138,14 @@ int main()
 	cv::namedWindow("Some Shape descriptors");
 	cv::imshow("Some Shape descriptors",result);
 
-	// New call to findContours but with CV_RETR_LIST flag
+	// New call to findContours but with RETR_LIST flag
 	image= cv::imread("binaryGroup.bmp",0);
 
 	// Get the contours of the connected components
 	cv::findContours(image, 
 		contours, // a vector of contours 
-		CV_RETR_LIST, // retrieve the external and internal contours
-		CV_CHAIN_APPROX_NONE); // retrieve all pixels of each contours
+		cv::RETR_LIST, // retrieve the external and internal contours
+		cv::CHAIN_APPROX_NONE); // retrieve all pixels of each contours
 
 	// draw black contours on white image
 	result.setTo(255);
@@ -175,8 +174,8 @@ int main()
 	// Get the contours of the connected components
 	cv::findContours(componentsInv, 
 		contours, // a vector of contours 
-		CV_RETR_EXTERNAL, // retrieve the external contours
-		CV_CHAIN_APPROX_NONE); // retrieve all pixels of each contours
+		cv::RETR_EXTERNAL, // retrieve the external contours
+		cv::CHAIN_APPROX_NONE); // retrieve all pixels of each contours
 
 	// white image
 	cv::Mat quadri(components.size(),CV_8U,255);

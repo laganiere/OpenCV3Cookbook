@@ -3,9 +3,6 @@ Computer Vision Programming using the OpenCV Library.
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
 
-
-by Robert Laganiere, Packt Publishing, 2013.
-
 Files:
 	edgedetector.h
 	linefinder.h

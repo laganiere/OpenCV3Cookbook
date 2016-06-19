@@ -16,7 +16,6 @@ and any consequent failure, is purely the responsibility of the user.
 Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
-
 #include <iostream>
 #include <vector>
 #include <opencv2/core.hpp>
@@ -178,7 +177,7 @@ int main()
 	
 	// find the best fitting line
 	cv::Vec4f line;
-	cv::fitLine(points,line,CV_DIST_L2,0,0.01,0.01);
+	cv::fitLine(points, line, cv::DIST_L2, 0, 0.01, 0.01);
 
 	std::cout << "line: (" << line[0] << "," << line[1] << ")(" << line[2] << "," << line[3] << ")\n"; 
 
@@ -187,11 +186,9 @@ int main()
 	int x1= x0+100*line[0]; // add a vector of length 100
 	int y1= y0+100*line[1];
 	image= cv::imread("road.jpg",0);
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
 	// draw the line
-	cv::line(image,cv::Point(x0,y0),cv::Point(x1,y1),0,3);
+	cv::line(image,cv::Point(x0,y0),cv::Point(x1,y1),0,2);
 	cv::namedWindow("Fitted line");
 	cv::imshow("Fitted line",image);
 
@@ -200,8 +197,6 @@ int main()
 
    // Display the detected line image
 	image= cv::imread("road.jpg",0);
-	// image is resize for book printing
-	cv::resize(image, image, cv::Size(), 0.6, 0.6);
 
 	ld.drawDetectedLines(image);
 	cv::namedWindow("Detected Lines (2)");
