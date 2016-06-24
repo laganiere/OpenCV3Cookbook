@@ -21,6 +21,7 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
 #include "harrisDetector.h"
 
@@ -97,7 +98,7 @@ int main()
 		// draw a circle at each corner location
 		cv::circle(image,it->pt,3,cv::Scalar(255,255,255),1);
 		++it;
-e	}
+	}
 
     // Display the keypoints
 	cv::namedWindow("GFTT");
@@ -166,20 +167,22 @@ e	}
 	cv::flip(image, image, 0);
 
 	int total(100); // requested number of keypoints
-	int hstep(4), vstep(3); // a grid of 4 columns by 3 rows
+	int hstep(5), vstep(3); // a grid of 4 columns by 3 rows
 	// hstep= vstep= 1; // try without grid
 	int hsize(image.cols / hstep), vsize(image.rows / vstep);
 	int subtotal(total / (hstep*vstep)); // number of keypoints per grid
 	cv::Mat imageROI;
 	std::vector<cv::KeyPoint> gridpoints;
 
+	std::cout << "Grid of " << vstep << " by " << hstep << " each of size " << vsize << " by " << hsize << std::endl;
+
 	// detection with low threshold
 	ptrFAST->setThreshold(20); 
 	// non-max suppression
 	ptrFAST->setNonmaxSuppression(true);
 
+	// The final vector of keypoints
 	keypoints.clear();
-
 	// detect on each grid
 	for (int i = 0; i < vstep; i++)
 		for (int j = 0; j < hstep; j++) {
@@ -189,9 +192,11 @@ e	}
 			// detect the keypoints in grid
 			gridpoints.clear();
 			ptrFAST->detect(imageROI, gridpoints);
-			std::cout << "Number of (FAST): " << gridpoints.size() << std::endl;
-			for (auto it = gridpoints.begin(); it != gridpoints.begin() + subtotal; ++it) {
-				std::cout << "  " << it->response << std::endl;
+			std::cout << "Number of FAST in grid " << i << "," << j << ": " << gridpoints.size() << std::endl;
+			if (gridpoints.size() > subtotal) {
+				for (auto it = gridpoints.begin(); it != gridpoints.begin() + subtotal; ++it) {
+					std::cout << "  " << it->response << std::endl;
+				}
 			}
 
 			// get the strongest FAST features
@@ -217,80 +222,22 @@ e	}
 	cv::namedWindow("FAST Features (grid)");
 	cv::imshow("FAST Features (grid)", image);
 
-	/*
-	keypoints.clear();
-	cv::DynamicAdaptedFeatureDetector fastD(
-		new cv::FastAdjuster(40), // the feature detector
-		150,   // min number of features
-		200,   // max number of features
-		50);   // max number of iterations
-//	or
-//	cv::DynamicAdaptedFeatureDetector fastD(cv::FastAdjuster::create("FAST"),150,200,50);
-
-	fastD.detect(image,keypoints); // detect points
-	std::cout << "Number of keypoints (should be between 150 and 200): " << keypoints.size() << std::endl; 
-	
-	cv::drawKeypoints(image,keypoints,image,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_OVER_OUTIMG);
-
-    // Display the keypoints
-	cv::namedWindow("FAST Features [150,200]");
-	cv::imshow("FAST Features [150,200]",image);
-
-	// Grid adapted FAST feature
-	// Read input image
-	image= cv::imread("church01.jpg",0);
-
-	keypoints.clear();
-	cv::GridAdaptedFeatureDetector fastG(
-		new cv::FastFeatureDetector(10), // the feature detector
-		1200,   // max total number of keypoints
-		5,     // number of rows in grid
-		2);    // number of cols in grid
-
-	fastG.detect(image,keypoints);
-	std::cout << "Number of keypoints in grid (should be around 1200): " << keypoints.size() << std::endl; 
-	
-	cv::drawKeypoints(image,keypoints,image,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_OVER_OUTIMG);
-
-    // Display the keypoints
-	cv::namedWindow("FAST Features (5x2 grid)");
-	cv::imshow("FAST Features (5x2 grid)",image);
-
-	// Pyramid adapted FAST feature
-	// Read input image
-	image= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-
-	keypoints.clear();
-	cv::PyramidAdaptedFeatureDetector fastP(
-		new cv::FastFeatureDetector(60), // the feature detector
-		3);    // number of levels
-
-	fastP.detect(image,keypoints);
-	std::cout << "keypoint: " << keypoints[1].class_id << " , " << keypoints[1].octave << " , " << keypoints[1].size << std::endl; 
-	std::cout << "keypoint: " << keypoints[11].class_id << " , " << keypoints[11].octave << " , " << keypoints[11].size << std::endl; 
-	std::cout << "keypoint: " << keypoints[keypoints.size()-2].class_id << " , " << keypoints[keypoints.size()-2].octave << " , " << keypoints[keypoints.size()-2].size << std::endl; 
-	
-	cv::drawKeypoints(image,keypoints,image,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-    // Display the keypoints
-	cv::namedWindow("FAST (3)");
-	cv::imshow("FAST (3)",image);
-
 	// SURF:
 
 	// Read input image
-	image= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	image = cv::imread("church01.jpg", 0);
+	// rotate the image (to produce a horizontal image)
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
 
 	keypoints.clear();
 	// Construct the SURF feature detector object
-    //	cv::SURF surf(3000.0);
+	cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> ptrSURF = cv::xfeatures2d::SurfFeatureDetector::create(2000.0);
+	// detect the keypoints
+	ptrSURF->detect(image, keypoints);
+	
 	// Detect the SURF features
-    //	surf(image,cv::Mat(),keypoints);
-
-	// Construct the SURF feature detector object
-	cv::Ptr<cv::FeatureDetector> detector = new cv::SURF(2000.);
-	// Detect the SURF features
-	detector->detect(image,keypoints);
+	ptrSURF->detect(image,keypoints);
 	
 	cv::Mat featureImage;
 	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -302,10 +249,13 @@ e	}
 	std::cout << "Number of SURF keypoints: " << keypoints.size() << std::endl; 
 
 	// Read a second input image
-	image= cv::imread("church03.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	image= cv::imread("church03.jpg", cv::IMREAD_GRAYSCALE);
+	// rotate the image (to produce a horizontal image)
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
 
 	// Detect the SURF features
-	detector->detect(image,keypoints);
+	ptrSURF->detect(image,keypoints);
 	
 	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
@@ -316,14 +266,19 @@ e	}
 	// SIFT:
 
 	// Read input image
-	image= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	image= cv::imread("church01.jpg", cv::IMREAD_GRAYSCALE);
+	// rotate the image (to produce a horizontal image)
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
 
 	keypoints.clear();
-
 	// Construct the SIFT feature detector object
-	detector = new cv::SIFT();
+	cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> ptrSIFT = cv::xfeatures2d::SiftFeatureDetector::create();
+	// detect the keypoints
+	ptrSIFT->detect(image, keypoints);
+
 	// Detect the SIFT features
-	detector->detect(image,keypoints);
+	ptrSIFT->detect(image,keypoints);
 	
 	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
@@ -337,33 +292,28 @@ e	}
 
 	// Read input image
 	image= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-
-	keypoints.clear();
-
-	// Construct the BRISK feature detector object
-	detector = new cv::BRISK();
-	// Detect the BRISK features
-	detector->detect(image,keypoints);
-	
-	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+	// rotate the image (to produce a horizontal image)
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
 
     // Display the keypoints
 	cv::namedWindow("BRISK");
 	cv::imshow("BRISK",featureImage);
 
+	keypoints.clear();
 	// Construct another BRISK feature detector object
-	detector = new cv::BRISK(
-		20,  // threshold for FAST points to be accepted
+	cv::Ptr<cv::BRISK> ptrBRISK = cv::BRISK::create(
+		60,  // threshold for BRISK points to be accepted
 		5);  // number of octaves
 
 	// Detect the BRISK features
-	detector->detect(image,keypoints);
+	ptrBRISK->detect(image,keypoints);
 	
 	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-    // Display the keypoints
-	cv::namedWindow("BRISK Features (2)");
-	cv::imshow("BRISK Features (2)",featureImage);
+	// Display the keypoints
+	cv::namedWindow("BRISK");
+	cv::imshow("BRISK", featureImage);
 
 	std::cout << "Number of BRISK keypoints: " << keypoints.size() << std::endl; 
 
@@ -371,15 +321,18 @@ e	}
 
 	// Read input image
 	image= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	// rotate the image (to produce a horizontal image)
+	cv::transpose(image, image);
+	cv::flip(image, image, 0);
 
 	keypoints.clear();
-
-	// Construct the ORB feature detector object
-	detector = new cv::ORB(75, // total number of keypoints
-		                   1.2, // scale factor between layers
-						   8);  // number of layers in pyramid
-	// Detect the ORB features
-	detector->detect(image,keypoints);
+	// Construct the BRISK feature detector object
+	cv::Ptr<cv::ORB> ptrORB = cv::ORB::create(
+		75, // total number of keypoints
+		1.2, // scale factor between layers
+		8);  // number of layers in pyramid
+	// detect the keypoints
+	ptrORB->detect(image, keypoints);
 	
 	cv::drawKeypoints(image,keypoints,featureImage,cv::Scalar(255,255,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
@@ -388,7 +341,7 @@ e	}
 	cv::imshow("ORB",featureImage);
 
 	std::cout << "Number of ORB keypoints: " << keypoints.size() << std::endl; 
-*/
+
 	cv::waitKey();
 	return 0;
 }
