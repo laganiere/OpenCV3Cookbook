@@ -3,9 +3,6 @@ Computer Vision Programming using the OpenCV Library.
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
 
-
-by Robert Laganiere, Packt Publishing, 2013.
-
 File:
 	patches.cpp
 correspond to Recipe:
@@ -14,7 +11,7 @@ Matching local templates
 File:
 	matcher.cpp
 correspond to Recipe:
-Describing local intensity patterns
+Describing and matching local intensity patterns
 
 File:
 	binaryDescriptors.cpp
