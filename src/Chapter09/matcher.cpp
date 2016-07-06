@@ -40,7 +40,8 @@ int main()
 	// 3. Define feature detector
 	// Construct the SURF feature detector object
 	cv::Ptr<cv::Feature2D> ptrFeature2D = cv::xfeatures2d::SURF::create(2000.0);
-    //	cv::Ptr<cv::Feature2D> ptrFeature2D = cv::xfeatures2d::SIFT::create(74);
+	// to test with SIFT instead of SURF 
+    // cv::Ptr<cv::Feature2D> ptrFeature2D = cv::xfeatures2d::SIFT::create(74);
 
 	// 4. Keypoint detection
 	// Detect the SURF features
@@ -68,7 +69,9 @@ int main()
 
     // Construction of the matcher 
 	cv::BFMatcher matcher(cv::NORM_L2);
-//	 cv::BFMatcher matcher(cv::NORM_L2, true); // with crosscheck
+	// to test with crosscheck (symmetry) test
+	// note: must not be used in conjunction with ratio test
+    // cv::BFMatcher matcher(cv::NORM_L2, true); // with crosscheck
 	// Match the two image descriptors
     std::vector<cv::DMatch> matches;
     matcher.match(descriptors1,descriptors2, matches);
@@ -90,52 +93,30 @@ int main()
 	cv::imshow("SURF Matches",imageMatches);
 
 	std::cout << "Number of matches: " << matches.size() << std::endl; 
-/*
-	// radius match
-	float maxDist= 0.4;
-    std::vector<std::vector<cv::DMatch> > matches2;
-	matcher.radiusMatch(descriptors1, descriptors2, matches2, 
-		                maxDist); // maximum acceptable distance
-	                              // between the 2 descriptors
-   cv::drawMatches(
-     image1,keypoints1, // 1st image and its keypoints
-     image2,keypoints2, // 2nd image and its keypoints
-     matches2,          // the matches
-     imageMatches,      // the image produced
-     cv::Scalar(255,255,255),  // color of lines
-     cv::Scalar(255,255,255)); // color of points
-
-    int nmatches=0;
-	for (int i=0; i< matches2.size(); i++) nmatches+= matches2[i].size();
-	std::cout << "Number of matches (with min radius): " << nmatches << std::endl; 
-
-    // Display the image of matches
-	cv::namedWindow("SURF Matches (with min radius)");
-	cv::imshow("SURF Matches (with min radius)",imageMatches);
-	*/
 
 	// perform the ratio test
 
 	// find the best two matches of each keypoint
 	std::vector<std::vector<cv::DMatch> > matches2;
-	matcher.knnMatch(descriptors1,descriptors2, 
+	matcher.knnMatch(descriptors1, descriptors2, 
 		             matches2,
-		             2); // find the k best matches
+		             2); // find the k (2) best matches
 	matches.clear();
 
 	// perform ratio test
-	double ratio= 0.685;
+	double ratioMax= 0.85;
     std::vector<std::vector<cv::DMatch> >::iterator it;
 	for (it= matches2.begin(); it!= matches2.end(); ++it) {
 		//   first best match/second best match
-		if ((*it)[0].distance/(*it)[1].distance < ratio) {
+		if ((*it)[0].distance/(*it)[1].distance < ratioMax) {
 			// it is an acceptable match
 			matches.push_back((*it)[0]);
+
 		}
 	}
 	// matches is the new match set
 
-   cv::drawMatches(
+    cv::drawMatches(
      image1,keypoints1, // 1st image and its keypoints
      image2,keypoints2, // 2nd image and its keypoints
      matches,           // the matches
@@ -150,6 +131,30 @@ int main()
     // Display the image of matches
 	cv::namedWindow("SURF Matches (ratio test)");
 	cv::imshow("SURF Matches (ratio test)",imageMatches);
+
+	// radius match
+	float maxDist = 0.3;
+	matches2.clear();
+	matcher.radiusMatch(descriptors1, descriptors2, matches2,
+		                maxDist); // maximum acceptable distance
+				                  // between the 2 descriptors
+	cv::drawMatches(
+		image1, keypoints1, // 1st image and its keypoints
+		image2, keypoints2, // 2nd image and its keypoints
+		matches2,          // the matches
+		imageMatches,      // the image produced
+		cv::Scalar(255, 255, 255),  // color of lines
+		cv::Scalar(255, 255, 255),  // color of points
+		std::vector<std::vector< char >>(),    // masks if any 
+		cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+	int nmatches = 0;
+	for (int i = 0; i< matches2.size(); i++) nmatches += matches2[i].size();
+	std::cout << "Number of matches (with max radius): " << nmatches << std::endl;
+
+	// Display the image of matches
+	cv::namedWindow("SURF Matches (with max radius)");
+	cv::imshow("SURF Matches (with max radius)", imageMatches);
 
 	// scale-invariance test
 
@@ -187,6 +192,6 @@ int main()
 
 	std::cout << "Number of matches: " << matches.size() << std::endl; 
 
-   cv::waitKey();
-   return 0;
+    cv::waitKey();
+    return 0;
 }
