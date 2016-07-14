@@ -30,8 +30,8 @@ int main()
 	// image matching
 
 	// 1. Read input images
-	cv::Mat image1= cv::imread("church01.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-	cv::Mat image2= cv::imread("church02.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat image1= cv::imread("church01.jpg",cv::IMREAD_GRAYSCALE);
+	cv::Mat image2= cv::imread("church02.jpg",cv::IMREAD_GRAYSCALE);
 
 	// 2. Define keypoints vector
 	std::vector<cv::KeyPoint> keypoints1;
@@ -104,7 +104,7 @@ int main()
 	matches.clear();
 
 	// perform ratio test
-	double ratioMax= 0.85;
+	double ratioMax= 0.6;
     std::vector<std::vector<cv::DMatch> >::iterator it;
 	for (it= matches2.begin(); it!= matches2.end(); ++it) {
 		//   first best match/second best match
@@ -129,8 +129,8 @@ int main()
 	std::cout << "Number of matches (after ratio test): " << matches.size() << std::endl; 
 
     // Display the image of matches
-	cv::namedWindow("SURF Matches (ratio test)");
-	cv::imshow("SURF Matches (ratio test)",imageMatches);
+	cv::namedWindow("SURF Matches (ratio test at 0.6)");
+	cv::imshow("SURF Matches (ratio test at 0.6)",imageMatches);
 
 	// radius match
 	float maxDist = 0.3;
