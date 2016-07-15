@@ -74,34 +74,23 @@ int main()
 
 	std::cout << "Number of matched points: " << matches.size() << std::endl;
 
-	// Select few Matches  
-//	keypoints1.push_back(cv::KeyPoint(15,189,1));
-//	keypoints1.push_back(cv::KeyPoint(140,242,1));
-//	keypoints2.push_back(cv::KeyPoint(48,182,1));
-//	keypoints2.push_back(cv::KeyPoint(118,222,1));
+	// Manually select few Matches  
 	std::vector<cv::DMatch> selMatches;
 
 	// make sure to double-check if the selected matches are valid
-//no	selMatches.push_back(matches[1]);  
 	selMatches.push_back(matches[2]);  
 	selMatches.push_back(matches[5]);
-//	selMatches.push_back(matches[9]);
-//	selMatches.push_back(matches[11]);
 	selMatches.push_back(matches[16]);
 	selMatches.push_back(matches[19]);
-//	selMatches.push_back(matches[13]);
 	selMatches.push_back(matches[14]);
 	selMatches.push_back(matches[34]);
-	//no	selMatches.push_back(matches[23]);
 	selMatches.push_back(matches[29]);
-//	selMatches.push_back(cv::DMatch(keypoints1.size()-2,keypoints2.size()-2,1));
-//	selMatches.push_back(cv::DMatch(keypoints1.size()-1,keypoints2.size()-1,1));
 
 	// Draw the selected matches
 	cv::Mat imageMatches;
 	cv::drawMatches(image1,keypoints1,  // 1st image and its keypoints
 		            image2,keypoints2,  // 2nd image and its keypoints
-					selMatches,			// the matches
+					selMatches,			// the selected matches
 //					matches,			// the matches
 					imageMatches,		// the image produced
 					cv::Scalar(255,255,255),
@@ -112,7 +101,6 @@ int main()
 	cv::namedWindow("Matches");
 	cv::imshow("Matches",imageMatches);
 		
-/*
 	// Convert 1 vector of keypoints into
 	// 2 vectors of Point2f
 	std::vector<int> pointIndexes1;
@@ -163,6 +151,8 @@ int main()
 		fund, // F matrix
 		lines1);     // vector of epipolar lines
 
+	std::cout << "size of F matrix:" << fund.rows << "x" << fund.cols << std::endl;
+
 	// for all epipolar lines
 	for (std::vector<cv::Vec3f>::const_iterator it= lines1.begin();
 		 it!=lines1.end(); ++it) {
@@ -184,13 +174,16 @@ int main()
 				             cv::Point(image1.cols,-((*it)[2]+(*it)[0]*image1.cols)/(*it)[1]),
 							 cv::Scalar(255,255,255));
 	}
-		
+	
+	// combine both images
+	cv::Mat both(image1.rows,image1.cols+image2.cols, CV_8U);
+	image1.copyTo(both.colRange(0, image1.cols));
+	image2.copyTo(both.colRange(image1.cols, image1.cols+image2.cols));
+
     // Display the images with points and epipolar lines
-	cv::namedWindow("Epilines (1)");
-	cv::imshow("Epilines (1)",image1);
-	cv::namedWindow("Epilines (2)");
-	cv::imshow("Epilines (2)",image2);
-	*/
+	cv::namedWindow("Epilines");
+	cv::imshow("Epilines",both);
+	
 	cv::waitKey();
 	return 0;
 }
