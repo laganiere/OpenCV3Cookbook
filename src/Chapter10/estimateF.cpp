@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------*\
-This file contains material supporting chapter 6 of the book:
+This file contains material supporting chapter 10 of the book:
 OpenCV3 Computer Vision Application Programming Cookbook
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
@@ -139,7 +139,7 @@ int main()
 	cv::Mat fundamental= cv::findFundamentalMat(
 		selPoints1, // points in first image
 		selPoints2, // points in second image
-		CV_FM_7POINT);       // 7-point method
+		cv::FM_7POINT);       // 7-point method
 
 	std::cout << "F-Matrix size= " << fundamental.rows << "," << fundamental.cols << std::endl;
 	cv::Mat fund(fundamental, cv::Rect(0, 0, 3, 3));
@@ -183,7 +183,27 @@ int main()
     // Display the images with points and epipolar lines
 	cv::namedWindow("Epilines");
 	cv::imshow("Epilines",both);
-	
+/*
+	// Convert keypoints into Point2f
+	std::vector<cv::Point2f> points1, points2, newPoints1, newPoints2;
+	cv::KeyPoint::convert(keypoints1, points1);
+	cv::KeyPoint::convert(keypoints2, points2);
+	cv::correctMatches(fund, points1, points2, newPoints1, newPoints2);
+	cv::KeyPoint::convert(newPoints1, keypoints1);
+	cv::KeyPoint::convert(newPoints2, keypoints2);
+
+	cv::drawMatches(image1, keypoints1,  // 1st image and its keypoints
+		image2, keypoints2,  // 2nd image and its keypoints
+		matches,			// the matches
+		imageMatches,		// the image produced
+		cv::Scalar(255, 255, 255),
+		cv::Scalar(255, 255, 255),
+		std::vector<char>(),
+		2
+		); // color of the lines
+	cv::namedWindow("Corrected matches");
+	cv::imshow("Corrected matches", imageMatches);
+	*/
 	cv::waitKey();
 	return 0;
 }

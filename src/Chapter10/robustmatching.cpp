@@ -1,39 +1,37 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 10 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 10 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #include <iostream>
 #include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/xfeatures2d.hpp>
 #include "robustMatcher.h"
 
 int main()
 {
-	// to be able to construct SURF and SIFT
-	cv::initModule_nonfree();
-
 	// Read input images
 	cv::Mat image1= cv::imread("church01.jpg",0);
 	cv::Mat image2= cv::imread("church03.jpg",0);
+
 	if (!image1.data || !image2.data)
 		return 0; 
 
@@ -44,13 +42,14 @@ int main()
 	cv::imshow("Left Image",image2);
 
 	// Prepare the matcher (with default parameters)
-	RobustMatcher rmatcher("SURF");
+	// here SIFT detector and descriptor
+	RobustMatcher rmatcher(cv::xfeatures2d::SIFT::create(250));
 
 	// Match the two images
 	std::vector<cv::DMatch> matches;
 
 	std::vector<cv::KeyPoint> keypoints1, keypoints2;
-	cv::Mat fundamental= rmatcher.match(image1,image2,matches, 
+	cv::Mat fundamental = rmatcher.match(image1, image2, matches,
 		keypoints1, keypoints2);
 
 	// draw the matches

@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 10 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 10 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #if !defined MATCHER
@@ -21,12 +21,12 @@
 
 #include <iostream>
 #include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/nonfree/features2d.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
 #define NOCHECK      0
 #define CROSSCHECK   1
@@ -40,7 +40,7 @@ class RobustMatcher {
 	  // pointer to the feature point detector object
 	  cv::Ptr<cv::FeatureDetector> detector;
 	  // pointer to the feature descriptor extractor object
-	  cv::Ptr<cv::DescriptorExtractor> extractor;
+	  cv::Ptr<cv::DescriptorExtractor> descriptor;
 	  int normType;
 	  float ratio; // max ratio between 1st and 2nd NN
 	  bool refineF; // if true will refine the F matrix
@@ -50,30 +50,27 @@ class RobustMatcher {
 
   public:
 
-	  RobustMatcher(std::string detectorName, std::string descriptorName="") 
-		  : normType(cv::NORM_L2), ratio(0.8f), refineF(true), refineM(true), confidence(0.98), distance(1.0) {	  
+	  RobustMatcher(const cv::Ptr<cv::FeatureDetector> &detector, 
+		            const cv::Ptr<cv::DescriptorExtractor> &descriptor= cv::Ptr<cv::DescriptorExtractor>())
+		  : detector(detector), descriptor(descriptor),normType(cv::NORM_L2), 
+		    ratio(0.8f), refineF(true), refineM(true), confidence(0.98), distance(1.0) {	  
 
-		  if (detectorName.length()>0) {
-			detector= cv::FeatureDetector::create(detectorName);
-
-			if (descriptorName.length()>0) { 
-				extractor= cv::DescriptorExtractor::create(descriptorName);
-			} else { // or use the descriptor associated with the detector
-				extractor= cv::DescriptorExtractor::create(detectorName);
-			}
-		  }
+		// in this case use the associated descriptor
+		if (!this->descriptor) { 
+			this->descriptor = this->detector;
+		} 
 	  }
 
 	  // Set the feature detector
-	  void setFeatureDetector(cv::Ptr<cv::FeatureDetector>& detect) {
+	  void setFeatureDetector(const cv::Ptr<cv::FeatureDetector>& detect) {
 
-		  detector= detect;
+		  this->detector= detect;
 	  }
 
 	  // Set descriptor extractor
-	  void setDescriptorExtractor(cv::Ptr<cv::DescriptorExtractor>& desc) {
+	  void setDescriptorExtractor(const cv::Ptr<cv::DescriptorExtractor>& desc) {
 
-		  extractor= desc;
+		  this->descriptor= desc;
 	  }
 
 	  // Set the norm to be used for matching
@@ -197,7 +194,7 @@ class RobustMatcher {
 
 		// Convert keypoints into Point2f	
 		std::vector<cv::Point2f> points1, points2;	
-		
+
 		for (std::vector<cv::DMatch>::const_iterator it= matches.begin();
 			 it!= matches.end(); ++it) {
 
@@ -211,10 +208,10 @@ class RobustMatcher {
 		std::vector<uchar> inliers(points1.size(),0);
 		cv::Mat fundamental= cv::findFundamentalMat(
 			points1,points2, // matching points
-		    inliers,      // match status (inlier or outlier)  
-		    CV_FM_RANSAC, // RANSAC method
-		    distance,     // distance to epipolar line
-		    confidence);  // confidence probability
+		    inliers,         // match status (inlier or outlier)  
+		    cv::FM_RANSAC,   // RANSAC method
+		    distance,        // distance to epipolar line
+		    confidence);     // confidence probability
 	
 		// extract the surviving (inliers) matches
 		std::vector<uchar>::const_iterator itIn= inliers.begin();
@@ -247,7 +244,7 @@ class RobustMatcher {
 			// Compute 8-point F from all accepted matches
 			fundamental= cv::findFundamentalMat(
 				points1,points2, // matching points
-				CV_FM_8POINT); // 8-point method
+				cv::FM_8POINT); // 8-point method
 
 			if (refineM) {
 
@@ -297,13 +294,13 @@ class RobustMatcher {
 
 		// 2. Extraction of the feature descriptors
 		cv::Mat descriptors1, descriptors2;
-		extractor->compute(image1,keypoints1,descriptors1);
-		extractor->compute(image2,keypoints2,descriptors2);
+		descriptor->compute(image1,keypoints1,descriptors1);
+		descriptor->compute(image2,keypoints2,descriptors2);
 
 		std::cout << "descriptor matrix size: " << descriptors1.rows << " by " << descriptors1.cols << std::endl;
 
 		// 3. Match the two image descriptors
-		//    (optionnaly apply some checking method)
+		//    (optionaly apply some checking method)
    
 		// Construction of the matcher with crosscheck 
 		cv::BFMatcher matcher(normType,            //distance measure
@@ -368,7 +365,7 @@ class RobustMatcher {
 	  
 	 // Match feature points using RANSAC
 	 // returns fundamental matrix and output match set
-     // this is the simpligied version presented in the book
+     // this is the simplified version presented in the book
 	  cv::Mat matchBook(cv::Mat& image1, cv::Mat& image2, // input images 
 		  std::vector<cv::DMatch>& matches, // output matches and keypoints
 		  std::vector<cv::KeyPoint>& keypoints1, std::vector<cv::KeyPoint>& keypoints2) { 
@@ -379,8 +376,8 @@ class RobustMatcher {
 
 		// 2. Extraction of the feature descriptors
 		cv::Mat descriptors1, descriptors2;
-		extractor->compute(image1,keypoints1,descriptors1);
-		extractor->compute(image2,keypoints2,descriptors2);
+		descriptor->compute(image1,keypoints1,descriptors1);
+		descriptor->compute(image2,keypoints2,descriptors2);
 
 		// 3. Match the two image descriptors
 		//    (optionnally apply some checking method)
