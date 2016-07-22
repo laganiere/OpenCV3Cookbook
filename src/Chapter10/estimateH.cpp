@@ -24,6 +24,7 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/xfeatures2d.hpp>
+#include <opencv2/stitching.hpp>
 
 int main()
 {
@@ -126,6 +127,24 @@ int main()
     // Display the warp image
 	cv::namedWindow("Image mosaic");
 	cv::imshow("Image mosaic",result);
+
+	// Read input images
+	std::vector<cv::Mat> images;
+	images.push_back(cv::imread("parliament1.jpg"));
+	images.push_back(cv::imread("parliament2.jpg"));
+
+	cv::Mat panorama; // output panorama
+	// create the stitcher
+	cv::Stitcher stitcher = cv::Stitcher::createDefault();
+	// stitch the images
+	cv::Stitcher::Status status = stitcher.stitch(images, panorama);
+
+	if (status == cv::Stitcher::OK) // success?
+	{
+		// Display the panorama
+		cv::namedWindow("Panorama");
+		cv::imshow("Panorama", panorama);
+	}
 
 	cv::waitKey();
 	return 0;
