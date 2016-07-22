@@ -16,6 +16,11 @@ File:
 	estimateH.cpp
 correspond to Recipe:
 Computing a homography between two images
+Files:
+	matchingTarget.cpp
+        targetMatcher.h
+correspond to Recipe:
+Computing a homography between two images
 
 You need the images:
 
@@ -24,5 +29,8 @@ church02.jpg
 church03.jpg
 parliament1.jpg
 parliament2.jpg
+parliament3.jpg
+cookbook1.bmp
+objects.jpg
 
 
