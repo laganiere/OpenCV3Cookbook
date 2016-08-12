@@ -48,11 +48,12 @@ int main()
 	std::vector<cv::DMatch> matches;
 	std::vector<cv::KeyPoint> keypoints1, keypoints2;
 	std::vector<cv::Point2f> corners;
-	// the reference image
-	tmatcher.setTarget(target); 
-	// match image with target
 
-	tmatcher.detectTarget(image,corners,matches,keypoints1,keypoints2);
+	// set the target image
+	tmatcher.setTarget(target); 
+
+	// match image with target
+	tmatcher.detectTarget(image, corners);
 	// draw the target corners on the image
 	if (corners.size() == 4) { // we have a detection
 
@@ -61,19 +62,8 @@ int main()
 		cv::line(image, cv::Point(corners[2]), cv::Point(corners[3]), cv::Scalar(255, 255, 255), 3);
 		cv::line(image, cv::Point(corners[3]), cv::Point(corners[0]), cv::Scalar(255, 255, 255), 3);
 	}
-
-	// draw the matches
-	cv::Mat imageMatches;
-	cv::drawMatches(target,keypoints1,  // 1st image and its keypoints
-		            image,keypoints2,  // 2nd image and its keypoints
-					matches,			// the matches
-					imageMatches,		// the image produced
-					cv::Scalar(255,255,255),  // color of the lines
-					cv::Scalar(255,255,255),  // color of the keypoints
-					std::vector<char>(),
-					2); 
-	cv::namedWindow("Matches");
-	cv::imshow("Matches",imageMatches);
+	cv::namedWindow("Target detection");
+	cv::imshow("Target detection",image);
 
 	cv::waitKey();
 	return 0;
