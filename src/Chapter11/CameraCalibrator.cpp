@@ -1,20 +1,21 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 10 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 11 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
+
 
 #include "CameraCalibrator.h"
 
@@ -49,27 +50,30 @@ int CameraCalibrator::addChessboardPoints(
         image = cv::imread(filelist[i],0);
 
         // Get the chessboard corners
-        bool found = cv::findChessboardCorners(
-                        image, boardSize, imageCorners);
+        bool found = cv::findChessboardCorners(image,         // image of chessboard pattern 
+			                                   boardSize,     // size of pattern
+			                                   imageCorners); // list of detected corners
 
         // Get subpixel accuracy on the corners
-        cv::cornerSubPix(image, imageCorners, 
-                  cv::Size(5,5), 
-                  cv::Size(-1,-1), 
-			cv::TermCriteria(cv::TermCriteria::MAX_ITER +
-                          cv::TermCriteria::EPS, 
-             30,		// max number of iterations 
-             0.1));     // min accuracy
+		if (found) {
+			cv::cornerSubPix(image, imageCorners,
+				cv::Size(5, 5), // half size of serach window
+				cv::Size(-1, -1),
+				cv::TermCriteria(cv::TermCriteria::MAX_ITER +
+					cv::TermCriteria::EPS,
+					30,		// max number of iterations 
+					0.1));  // min accuracy
 
-          // If we have a good board, add it to our data
-		  if (imageCorners.size() == boardSize.area()) {
+			// If we have a good board, add it to our data
+			if (imageCorners.size() == boardSize.area()) {
 
-			// Add image and scene points from one view
-            addPoints(imageCorners, objectCorners);
-            successes++;
-          }
+				// Add image and scene points from one view
+				addPoints(imageCorners, objectCorners);
+				successes++;
+			}
+		}
 
-		if (windowName.length()>0) {
+		if (windowName.length()>0 && imageCorners.size() == boardSize.area()) {
         
 			//Draw the corners
 			cv::drawChessboardCorners(image, boardSize, imageCorners, found);
@@ -114,9 +118,12 @@ double CameraCalibrator::calibrate(const cv::Size imageSize)
 }
 
 // remove distortion in an image (after calibration)
-cv::Mat CameraCalibrator::remap(const cv::Mat &image) {
+cv::Mat CameraCalibrator::remap(const cv::Mat &image, cv::Size &outputSize) {
 
 	cv::Mat undistorted;
+
+	if (outputSize.height == -1)
+		outputSize = image.size();
 
 	if (mustInitUndistort) { // called once per calibration
     
@@ -125,8 +132,7 @@ cv::Mat CameraCalibrator::remap(const cv::Mat &image) {
             distCoeffs,    // computed distortion matrix
             cv::Mat(),     // optional rectification (none) 
 			cv::Mat(),     // camera matrix to generate undistorted
-//			cv::Size(640,480),
-            image.size(),  // size of undistorted
+            outputSize,    // size of undistorted
             CV_32FC1,      // type of output map
             map1, map2);   // the x and y mapping functions
 

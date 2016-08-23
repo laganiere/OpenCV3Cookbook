@@ -1,20 +1,21 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 10 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 11 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
+
 
 #ifndef CAMERACALIBRATOR_H
 #define CAMERACALIBRATOR_H
@@ -22,17 +23,18 @@
 #include <vector>
 #include <iostream>
 
-#include <opencv2/core/core.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/calib3d.hpp"
+#include <opencv2/highgui.hpp>
 
 class CameraCalibrator {
 
     // input points:
     // the points in world coordinates
+	// (each square is one unit)
     std::vector<std::vector<cv::Point3f> > objectPoints;
-    // the point positions in pixels
+    // the image point positions in pixels
     std::vector<std::vector<cv::Point2f> > imagePoints;
     // output Matrices
     cv::Mat cameraMatrix;
@@ -55,7 +57,7 @@ class CameraCalibrator {
     // Set the calibration flag
     void setCalibrationFlag(bool radial8CoeffEnabled=false, bool tangentialParamEnabled=false);
 	// Remove distortion in an image (after calibration)
-    cv::Mat remap(const cv::Mat &image);
+	cv::Mat remap(const cv::Mat &image, cv::Size &outputSize = cv::Size(-1, -1));
 
     // Getters
     cv::Mat getCameraMatrix() { return cameraMatrix; }
