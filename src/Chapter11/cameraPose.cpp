@@ -64,31 +64,31 @@ int main()
 	// Draw image points
 	for (int i = 0; i < 8; i++) {
 		cv::circle(image, imagePoints[i], 3, cv::Scalar(0, 0, 0),2);
-//		cv::circle(image, imagePoints[i], 2, cv::Scalar(255, 255, 255));
 	}
 	cv::imshow("An image of a bench", image);
 
-	/// Create a window
+	// Create a viz window
     cv::viz::Viz3d visualizer("Viz window");
 	visualizer.setBackgroundColor(cv::viz::Color::white());
 
-    /// Add coordinate axes
-//    visualizer.showWidget("Frame", cv::viz::WCoordinateSystem());
-
-    /// Add line to represent (1,1,1) axis
-//    viz::WLine axis(Point3f(-1.0f,-1.0f,-1.0f), Point3f(1.0f,1.0f,1.0f));
- //   axis.setRenderingProperty(viz::LINE_WIDTH, 4.0);
- //   visualizer.showWidget("Line Widget", axis);
-
     /// Construct the scene
-///	cv::viz::WCloud points(objectPoints);
-//	points.setRenderingProperty(cv::viz::POINT_SIZE, 20.0);
-	cv::viz::WCameraPosition cam(cMatrix,image,30.0,cv::viz::Color::black());
-	cv::viz::WCube plane1(cv::Point3f(0.0, 45.0, 0.0), cv::Point3f(242.5, 21.0, -9.0), true, cv::viz::Color::blue());
+	// Create a virtual camera
+	cv::viz::WCameraPosition cam(cMatrix,  // matrix of intrinsics
+		                         image,    // image displayed on the plane
+		                         30.0,     // scale factor
+		                         cv::viz::Color::black());
+	// Create a virtual bench from cuboids
+	cv::viz::WCube plane1(cv::Point3f(0.0, 45.0, 0.0), 
+		                  cv::Point3f(242.5, 21.0, -9.0), 
+		                  true,  // show wire frame 
+		                  cv::viz::Color::blue());
 	plane1.setRenderingProperty(cv::viz::LINE_WIDTH, 4.0);
-	cv::viz::WCube plane2(cv::Point3f(0.0, 9.0, -9.0), cv::Point3f(242.5, 0.0, 44.5), true, cv::viz::Color::blue());
+	cv::viz::WCube plane2(cv::Point3f(0.0, 9.0, -9.0), 
+		                  cv::Point3f(242.5, 0.0, 44.5), 
+		                  true,  // show wire frame 
+		                  cv::viz::Color::blue());
 	plane2.setRenderingProperty(cv::viz::LINE_WIDTH, 4.0);
-//	visualizer.showWidget("points", points);
+	// Add the virtual objects to the environment
 	visualizer.showWidget("top", plane1);
 	visualizer.showWidget("bottom", plane2);
 	visualizer.showWidget("Camera", cam);
@@ -101,36 +101,22 @@ int main()
 	std::cout << " rvec: " << rvec.rows << "x" << rvec.cols << std::endl;
 	std::cout << " tvec: " << tvec.rows << "x" << tvec.cols << std::endl;
 
-    /// Rodrigues vector
-//    Mat rot_vec = Mat::zeros(1,3,CV_32F);
-  //  float translation_phase = 0.0, translation = 0.0;
-    while(cv::waitKey(100)==-1 && !visualizer.wasStopped())
+	cv::Mat rotation;
+	// convert vector-3 rotation
+	// to a 3x3 rotation matrix
+	cv::Rodrigues(rvec, rotation);
+
+	// Move the bench	
+	cv::Affine3d pose(rotation, tvec);
+	visualizer.setWidgetPose("top", pose);
+	visualizer.setWidgetPose("bottom", pose);
+
+	// visualization loop
+	while(cv::waitKey(100)==-1 && !visualizer.wasStopped())
     {
-        /* Rotation using rodrigues */
-        /// Rotate around (1,1,1)
-		/*
-        rot_vec.at<float>(0,0) += CV_PI * 0.01f;
-        rot_vec.at<float>(0,1) += CV_PI * 0.01f;
-        rot_vec.at<float>(0,2) += CV_PI * 0.01f;
 
-        /// Shift on (1,1,1)
-        translation_phase += CV_PI * 0.01f;
-        translation = sin(translation_phase);
-		*/
-
-		// Convert to 3D rotation matrix
-        cv::Mat rotation;
-        cv::Rodrigues(rvec, rotation);
-
-        /// Construct pose
-		
-//		cv::Affine3d pose(cv::Mat::eye(3, 3, CV_32F), tvec);
-		cv::Affine3d pose(rotation, tvec);
-
-		visualizer.setWidgetPose("top", pose);
-		visualizer.setWidgetPose("bottom", pose);
-
-        visualizer.spinOnce(1, true);
+        visualizer.spinOnce(1,     // pause 1ms 
+			                true); // redraw
     }
 
     return 0;
