@@ -24,7 +24,6 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/xfeatures2d.hpp>
-#include "robustMatcher.h"
 
 int main()
 {

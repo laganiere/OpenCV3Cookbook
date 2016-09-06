@@ -15,9 +15,11 @@ target_link_libraries( cameraPose ${OpenCV_LIBS})
 target_link_libraries( estimateE ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
-SET (IMAGES ${CMAKE_SOURCE_DIR}/images/objects.jpg
-            ${CMAKE_SOURCE_DIR}/images/bench2.jpg)
-            ${CMAKE_SOURCE_DIR}/images/chessboards)
+SET (IMAGES ${CMAKE_SOURCE_DIR}/images/bench2.jpg
+            calib.xml)
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")
 FILE(COPY ${IMAGES} DESTINATION "Release")
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/chessboards/ DESTINATION ./chessboards/)
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/chessboards/ DESTINATION "Debug/chessboards/")
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/chessboards/ DESTINATION "Release/chessboards/")
