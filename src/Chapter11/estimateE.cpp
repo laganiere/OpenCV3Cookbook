@@ -120,9 +120,6 @@ int main()
 		cv::RANSAC, 0.9, 1.0, // RANSAC method  
 		inliers);             // extracted inliers
 
-	// Correct the match using epipolar constraint
-//	cv::correctMatches(essential, points1, points2, points1, points2);
-
 	int numberOfPts(cv::sum(inliers)[0]);
 	std::cout << "Number of inliers: " << numberOfPts << std::endl;
 
@@ -149,91 +146,44 @@ int main()
 	std::cout << "rotation:" << rotation << std::endl;
 	std::cout << "translation:" << translation << std::endl;
 
-
-	// compose projection matrix from R,T and K
-	cv::Mat projection2(3, 4, CV_64F); // the 3x4 projection matrix
+	// compose projection matrix from R,T 
+	cv::Mat projection2(3, 4, CV_64F);        // the 3x4 projection matrix
 	rotation.copyTo(projection2(cv::Rect(0, 0, 3, 3)));
 	translation.copyTo(projection2.colRange(3, 4));
-	// projection2 = cameraMatrix*projection2; // adding calibration
 
-
-	// compose generic projection matrix from K
-//	cv::Mat projection1(3, 4, CV_64F, 0.); // the 3x4 projection matrix
-	cv::Mat projection1(3, 4, CV_64F, 0.); // the 3x4 projection matrix
+	// compose generic projection matrix 
+	cv::Mat projection1(3, 4, CV_64F, 0.);    // the 3x4 projection matrix
 	cv::Mat diag(cv::Mat::eye(3, 3, CV_64F));
 	diag.copyTo(projection1(cv::Rect(0, 0, 3, 3)));
-	// projection1 = cameraMatrix*projection1; // adding calibration
 
 	std::cout << "First Projection matrix=" << projection1 << std::endl;
 	std::cout << "Second Projection matrix=" << projection2 << std::endl;
 
-	// input and output points
-	cv::Mat points3Dhomog;
-//	cv::Mat points3Dhomog(numberOfPts, 1, CV_64FC4);
-	//	cv::Mat cam1pts(numberOfPts, 1, CV_64FC2);
-//	cv::Mat cam2pts(numberOfPts, 1, CV_64FC2);
+	// to contain the inliers
+	std::vector<cv::Vec2d> inlierPts1;
+	std::vector<cv::Vec2d> inlierPts2;
 
-	std::vector<cv::Vec2d> cam1pts;
-	std::vector<cv::Vec2d> cam2pts;
-
-	// create inliers input points for triangulation
+	// create inliers input point vector for triangulation
 	int j(0); 
 	for (int i = 0; i < inliers.rows; i++) {
 
 		if (inliers.at<uchar>(i)) {
-			cam1pts.push_back(cv::Vec2d(points1[i].x, points1[i].y));
-			cam2pts.push_back(cv::Vec2d(points2[i].x, points2[i].y));
-			//		cam1pts.at<cv::Point2d>(j) = points1[i];
-	//		cam2pts.at<cv::Point2d>(j++) = points2[i];
-
-			std::cout << j++ << ") "<< points1[i] << "<->" << points2[i] << std::endl;
+			inlierPts1.push_back(cv::Vec2d(points1[i].x, points1[i].y));
+			inlierPts2.push_back(cv::Vec2d(points2[i].x, points2[i].y));
 		}
 	}
 
-	std::cout << "Point avant undistort: " << cam1pts[124] <<std::endl;
+	// undistort and normalize the image points
 	std::vector<cv::Vec2d> points1u;
-	cv::undistortPoints(cam1pts, points1u, cameraMatrix, cameraDistCoeffs);
+	cv::undistortPoints(inlierPts1, points1u, cameraMatrix, cameraDistCoeffs);
 	std::vector<cv::Vec2d> points2u;
-	cv::undistortPoints(cam2pts, points2u, cameraMatrix, cameraDistCoeffs);
-	std::cout << "Point apres undistort: " << points1u[124]<< std::endl;
-	
+	cv::undistortPoints(inlierPts2, points2u, cameraMatrix, cameraDistCoeffs);
 
-//	cv::triangulatePoints(projection1, projection2, points1u, points2u, points3Dhomog);
-
+	// triangulation
 	std::vector<cv::Vec3d> points3D;
 	triangulate(projection1, projection2, points1u, points2u, points3D);
-//	cv::Mat points3D(1, numberOfPts, CV_64FC3); 
-	/*
-	for (int i = 0; i < numberOfPts; i++) {
-		points3D.push_back(cv::Vec3d(points3Dhomog.at<cv::Vec4d>(i)[0] / points3Dhomog.at<cv::Vec4d>(i)[3],
-			points3Dhomog.at<cv::Vec4d>(i)[1] / points3Dhomog.at<cv::Vec4d>(i)[3],
-			points3Dhomog.at<cv::Vec4d>(i)[2] / points3Dhomog.at<cv::Vec4d>(i)[3]));
-			
-		points3D.at<cv::Vec3d>(i)[0] = points3Dhomog.at<cv::Vec4d>(i)[0] / points3Dhomog.at<cv::Vec4d>(i)[3];
-		points3D.at<cv::Vec3d>(i)[1] = points3Dhomog.at<cv::Vec4d>(i)[1] / points3Dhomog.at<cv::Vec4d>(i)[3];
-		points3D.at<cv::Vec3d>(i)[2] = points3Dhomog.at<cv::Vec4d>(i)[2] / points3Dhomog.at<cv::Vec4d>(i)[3];
 
-		if (points3D.at<cv::Vec3d>(i)[0]>5 || points3D.at<cv::Vec3d>(i)[0] < -5)
-			points3D.at<cv::Vec3d>(i)[0] = 0.0;
-		if (points3D.at<cv::Vec3d>(i)[1]>5 || points3D.at<cv::Vec3d>(i)[1] < -5)
-			points3D.at<cv::Vec3d>(i)[1] = 0.0;
-		if (points3D.at<cv::Vec3d>(i)[2]>5 || points3D.at<cv::Vec3d>(i)[2] < -5)
-			points3D.at<cv::Vec3d>(i)[2] = 0.0;
-			
-//		std::cout << points3D.at<cv::Vec3d>(i) << std::endl;
-	}
-	*/
-//	std::cout << "Point 3d= " << points3D[124] << " == " << points3Dhomog.at<cv::Vec4d>(124) << std::endl;
-
-//	std::cout << "3:" << points3Dhomog.checkVector(3) << " 4:" << points3Dhomog.checkVector(4)<<std::endl;
-//	points3Dhomog.reshape(4, numberOfPts);
-//	std::cout << "3:" << points3Dhomog.checkVector(3) << " 4:" << points3Dhomog.checkVector(4) << std::endl;
-//	std::cout << points3Dhomog.rows << "x" << points3Dhomog.cols << std::endl;
-
-//	cv::convertPointsFromHomogeneous(points3Dhomog, points3D);
-//	std::cout << points3D.rows << "x" << points3D.cols << std::endl;
-
-
+	// -------------------
 	// Create a viz window
 	cv::viz::Viz3d visualizer("Viz window");
 	visualizer.setBackgroundColor(cv::viz::Color::white());
@@ -241,54 +191,38 @@ int main()
 	/// Construct the scene
 	// Create one virtual camera
 	cv::viz::WCameraPosition cam1(cMatrix,  // matrix of intrinsics
-		image1,    // image displayed on the plane
-		1.0,     // scale factor
+		image1,                             // image displayed on the plane
+		1.0,                                // scale factor
 		cv::viz::Color::black());
 	// Create a second virtual camera
 	cv::viz::WCameraPosition cam2(cMatrix,  // matrix of intrinsics
-		image2,    // image displayed on the plane
-		1.0,     // scale factor
+		image2,                             // image displayed on the plane
+		1.0,                                // scale factor
 		cv::viz::Color::black());
-	cv::viz::WSphere pt3D(points3D[124], 0.1, 10, cv::viz::Color::apricot());
 
-	cv::Mat pp(4, 1, CV_64F, 0.);
-	pp.at<double>(0) = 3.*points1u[124](0);// , 3.*points1u[124](1), 3., 1. };
-	pp.at<double>(1) = 3.*points1u[124](1);
-	pp.at<double>(2) = 3.;
-	pp.at<double>(3) = 1.;
-	cv::Mat project= projection2*pp;
+	// choose one point for visualization
+	cv::Vec3d testPoint = triangulate(projection1, projection2, points1u[124], points2u[124]);
+	cv::viz::WSphere point3D(testPoint, 0.05, 10, cv::viz::Color::red());
+	// its associated line of projection
+	cv::viz::WLine line1(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points1u[124](0), 5.*points1u[124](1), 5.), cv::viz::Color::green());
+	cv::viz::WLine line2(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points2u[124](0), 5.*points2u[124](1), 5.), cv::viz::Color::green());
 
-	std::cout << "projection="<<project << std::endl;
-	cv::viz::WSphere pro(cv::Vec3d(project.at<double>(0)/ project.at<double>(2), project.at<double>(1) / project.at<double>(2), 1.)
-		, 0.02, 10, cv::viz::Color::apricot());
-
-
-	cv::Vec3d testpt = triangulate(projection1, projection2, points1u[124], points2u[124]);
-	cv::viz::WSphere lspoint(testpt, 0.1, 10, cv::viz::Color::red());
-
+	// the reconstructed cloud of 3D points
 	cv::viz::WCloud cloud(points3D, cv::viz::Color::blue());
-
-//	cv::viz::WLine line1(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points1u.at<cv::Point2d>(124).x, 5.*points1u.at<cv::Point2d>(124).y, 5.), cv::viz::Color::green());
-	cv::viz::WLine line1(cv::Point3d(0., 0., 0.), cv::Point3d(3.*points1u[124](0), 3.*points1u[124](1), 3.), cv::viz::Color::green());
-	//	cv::viz::WLine line2(cv::Point3d(0., 0., 0.), cv::Point3d(v2[1].x, v2[1].y, 1.), cv::viz::Color::green());
-//	cv::viz::WLine line3(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points2u.at<cv::Point2d>(124).x, 5.*points2u.at<cv::Point2d>(124).y, 5.), cv::viz::Color::green());
-	cv::viz::WLine line3(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points2u[124](0), 5.*points2u[124](1), 5.), cv::viz::Color::green());
+	cloud.setRenderingProperty(cv::viz::POINT_SIZE, 3.);
 
 	// Add the virtual objects to the environment
 	visualizer.showWidget("Camera1", cam1);
 	visualizer.showWidget("Camera2", cam2);
 	visualizer.showWidget("Cloud", cloud);
 	visualizer.showWidget("Line1", line1);
-//	visualizer.showWidget("Line2", line2);
-	visualizer.showWidget("Line3", line3);
-	visualizer.showWidget("Point3D", pt3D);
-	visualizer.showWidget("Projection", pro);
-	visualizer.showWidget("Triangulated", lspoint);
+	visualizer.showWidget("Line2", line2);
+	visualizer.showWidget("Triangulated", point3D);
 
 	// Move the second camera	
 	cv::Affine3d pose(rotation, translation);
 	visualizer.setWidgetPose("Camera2", pose);
-	visualizer.setWidgetPose("Line3", pose);
+	visualizer.setWidgetPose("Line2", pose);
 
 	// visualization loop
 	while (cv::waitKey(100) == -1 && !visualizer.wasStopped())
