@@ -204,8 +204,9 @@ int main()
 	cv::Vec3d testPoint = triangulate(projection1, projection2, points1u[124], points2u[124]);
 	cv::viz::WSphere point3D(testPoint, 0.05, 10, cv::viz::Color::red());
 	// its associated line of projection
-	cv::viz::WLine line1(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points1u[124](0), 5.*points1u[124](1), 5.), cv::viz::Color::green());
-	cv::viz::WLine line2(cv::Point3d(0., 0., 0.), cv::Point3d(5.*points2u[124](0), 5.*points2u[124](1), 5.), cv::viz::Color::green());
+	double lenght(4.);
+	cv::viz::WLine line1(cv::Point3d(0., 0., 0.), cv::Point3d(lenght*points1u[124](0), lenght*points1u[124](1), lenght), cv::viz::Color::green());
+	cv::viz::WLine line2(cv::Point3d(0., 0., 0.), cv::Point3d(lenght*points2u[124](0), lenght*points2u[124](1), lenght), cv::viz::Color::green());
 
 	// the reconstructed cloud of 3D points
 	cv::viz::WCloud cloud(points3D, cv::viz::Color::blue());
