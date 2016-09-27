@@ -3,34 +3,33 @@ Computer Vision Programming using the OpenCV Library.
 Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
 
-File:
-	estimateF.cpp
-correspond to Recipe:
-Computing the Fundamental Matrix of an Image Pair
 Files:
-	matcher.h
-	robustmatching.cpp
+	calibrate.cpp 
+        CameraCalibrator.cpp
 correspond to Recipe:
-Matching Images using Random Sample Consensus
+Calibrating a Camera
+
 File:
-	estimateH.cpp
+	cameraPose.cpp
 correspond to Recipe:
-Computing a homography between two images
+Recovering camera pose
+
 Files:
-	matchingTarget.cpp
-        targetMatcher.h
+	estimateE.cpp 
+	triangulate.h
+	triangulate.cpp
 correspond to Recipe:
-Computing a homography between two images
+Reconstructing a 3D scene from calibrated cameras
+
+Files:
+	stereoMatcher.cpp
+correspond to Recipe:
+Computing depth from stereo
 
 You need the images:
 
-church01.jpg
-church02.jpg
-church03.jpg
-parliament1.jpg
-parliament2.jpg
-parliament3.jpg
-cookbook1.bmp
-objects.jpg
-
-
+bench2.jpg
+soup1.jpg
+soup2.jpg
+brebeuf1.jpg
+brebeuf2.jpg			
