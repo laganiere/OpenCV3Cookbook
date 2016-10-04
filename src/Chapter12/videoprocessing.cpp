@@ -76,12 +76,15 @@ int main()
 		cv::imshow("Extracted Frame",frame);
 
 		std::string name(b);
-        std::ostringstream ss; ss << i; name+= ss.str(); i++;
+        std::ostringstream ss; ss << std::setfill('0') << std::setw(3) << i; name+= ss.str(); i++;
 		name+=ext;
 
 		std::cout << name <<std::endl;
 		
-		cv::imwrite(name,frame);
+		cv::Mat test;
+		cv::resize(frame, test, cv::Size(), 0.2,0.2);
+//		cv::imwrite(name, frame);
+		cv::imwrite(name, test);
 
 		// introduce a delay
 		// or press key to stop
