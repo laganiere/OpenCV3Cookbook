@@ -459,8 +459,10 @@ class VideoProcessor {
 				  break;
 
 			  // display input frame
-			  if (windowNameInput.length()!=0) 
-				  cv::imshow(windowNameInput,frame);
+			  if (windowNameInput.length() != 0) {
+				  cv::imshow(windowNameInput, frame);
+				  std::cout << windowNameInput << std::endl;
+			  }
 
 		      // calling the process function or method
 			  if (callIt) {
