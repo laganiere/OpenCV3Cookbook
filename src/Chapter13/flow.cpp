@@ -28,26 +28,32 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include "videoprocessor.h"
 
 // Drawing optical flow vectors on an image
-void drawOptFlowMap(const cv::Mat& oflow, cv::Mat& flowImage, int stride, float scale, const cv::Scalar& color) {
-	
+void drawOpticalFlow(const cv::Mat& oflow,    // the optical flow 
+	                 cv::Mat& flowImage,      // the produced image
+	                 int stride,  // the stride for displaying the vectors
+	                 float scale, // multiplying factor for the vectors
+	                 const cv::Scalar& color) // the color of the vectors
+{
+
+	// create the image if required
 	if (flowImage.size() != oflow.size()) {
 		flowImage.create(oflow.size(), CV_8UC3);
 		flowImage = cv::Vec3i(255,255,255);
 	}
 
+	// for all vectors using stride as a step
 	for (int y = 0; y < oflow.rows; y += stride)
 		for (int x = 0; x < oflow.cols; x += stride) {
-				
+			// gets the vector	
 			cv::Point2f vector = oflow.at< cv::Point2f>(y, x);
-				
+			// draw the line	
 			cv::line(flowImage, cv::Point(x, y), 
 				     cv::Point(static_cast<int>(x + scale*vector.x + 0.5), 
 						       static_cast<int>(y + scale*vector.y + 0.5)), color);
-				
+			// draw the arrow tip	
 			cv::circle(flowImage, cv::Point(static_cast<int>(x + scale*vector.x + 0.5),
 				                            static_cast<int>(y + scale*vector.y + 0.5)), 1, color, -1);
 		}
-	
 }
 
 int main()
@@ -70,36 +76,34 @@ int main()
 	std::cout << "Scale step: " << tvl1->getScaleStep() << std::endl; // size between scales
 	std::cout << "Number of warpings: " << tvl1->getWarpingsNumber() << std::endl; // size between scales
 	std::cout << "Stopping criteria: " << tvl1->getEpsilon() << " and " << tvl1->getOuterIterations() << std::endl; // size between scales
-	
-
 																													// compute the optical flow between 2 frames
 	cv::Mat oflow; // image of 2D flow vectors
+	// compute optical flow between frame1 and frame2
 	tvl1->calc(frame1, frame2, oflow);
 
 	// Draw the optical flow image
 	cv::Mat flowImage;
-	drawOptFlowMap(oflow,     // input flow vectors 
+	drawOpticalFlow(oflow,     // input flow vectors 
 		flowImage, // image to be generated
 		8,         // display vectors every 8 pixels
 		2,         // multiply size of vectors by 2
 		cv::Scalar(0, 0, 0)); // vector color
 
 	cv::imshow("Optical Flow", flowImage);
-	cv::waitKey();
 
-	// compute the optical flow between 2 frames
+	// compute a smoother optical flow between 2 frames
+	tvl1->setLambda(0.075);
 	tvl1->calc(frame1, frame2, oflow);
 
 	// Draw the optical flow image
 	cv::Mat flowImage2;
-	tvl1->setLambda(0.01);
-	drawOptFlowMap(oflow,     // input flow vectors 
+	drawOpticalFlow(oflow,     // input flow vectors 
 		flowImage2, // image to be generated
 		8,         // display vectors every 8 pixels
 		2,         // multiply size of vectors by 2
 		cv::Scalar(0, 0, 0)); // vector color
 
-	cv::imshow("Optical Flow (2)", flowImage2);
+	cv::imshow("Smoother Optical Flow", flowImage2);
 	cv::waitKey();
 
 	//	calcOpticalFlowSF(frame1, frame2,
