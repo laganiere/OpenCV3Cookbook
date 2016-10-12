@@ -20,10 +20,10 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 #include <opencv2/video/tracking.hpp>
 #include "videoprocessor.h"
 
@@ -105,46 +105,4 @@ int main()
 
 	cv::imshow("Smoother Optical Flow", flowImage2);
 	cv::waitKey();
-
-	//	calcOpticalFlowSF(frame1, frame2,
-	//	flow,
-		// 3, 2, 4, 4.1, 25.5, 18, 55.0, 25.5, 0.35, 18, 55.0, 25.5, 10);
-	// flow = cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-
-	/*
-	// Create video procesor instance
-	VideoProcessor processor;
-
-	// generate the filename
-	std::vector<std::string> imgs;
-	std::string prefix = "goose/goose";
-	std::string ext = ".bmp";
-
-	for (long i = 0; i < 317; i++) {
-
-		std::string name(prefix);
-		std::ostringstream ss; ss << std::setfill('0') << std::setw(3) << i; name += ss.str(); 
-		name += ext;
-
-		std::cout << name << std::endl;
-		imgs.push_back(name);
-	}
-	cv::waitKey();
-		// Open video file
-//	processor.setInput(imgs);
-	processor.setInput("goose.mp4");
-
-	// set frame processor
-//	processor.setFrameProcessor(&segmentor);
-
-	// Declare a window to display the video
-	processor.displayOutput("Original video");
-
-	// Play the video at the original frame rate
-	processor.setDelay(50);
-
-	// Start the process
-	processor.run();
-
-	cv::waitKey(); */
 }

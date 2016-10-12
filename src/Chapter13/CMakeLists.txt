@@ -7,10 +7,12 @@ cmake_minimum_required(VERSION 2.8)
 # add executable
 add_executable( tracker tracker.cpp)
 add_executable( flow flow.cpp)
+add_executable( oTracker oTracker.cpp)
 
 # link libraries
 target_link_libraries( tracker ${OpenCV_LIBS})
 target_link_libraries( flow ${OpenCV_LIBS})
+target_link_libraries( oTracker ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
 SET (IMAGES ${CMAKE_SOURCE_DIR}/images/bike.avi)

@@ -23,30 +23,44 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/video/tracking.hpp>
 
-#include "featuretracker.h"
+#include "visualTracker.h"
 
 int main()
 {
 	// Create video procesor instance
 	VideoProcessor processor;
 
+	// generate the filename
+	std::vector<std::string> imgs;
+	std::string prefix = "goose/goose";
+	std::string ext = ".bmp";
+
+	for (long i = 130; i < 317; i++) {
+
+		std::string name(prefix);
+		std::ostringstream ss; ss << std::setfill('0') << std::setw(3) << i; name += ss.str();
+		name += ext;
+
+		std::cout << name << std::endl;
+		imgs.push_back(name);
+	}
+
 	// Create feature tracker instance
-	FeatureTracker tracker;
+	VisualTracker tracker;
 
 	// Open video file
-	processor.setInput("bike.avi");
+	processor.setInput(imgs);
 
 	// set frame processor
 	processor.setFrameProcessor(&tracker);
 
 	// Declare a window to display the video
-	processor.displayOutput("Tracked Features");
+	processor.displayOutput("Tracked object");
 
 	// Play the video at the original frame rate
-	processor.setDelay(1000./processor.getFrameRate());
+	processor.setDelay(50);
 
-	processor.stopAtFrameNo(90);
-
+	tracker.setBoundingBox(cv::Rect(290,100,65,40));
 	// Start the process
 	processor.run();
 

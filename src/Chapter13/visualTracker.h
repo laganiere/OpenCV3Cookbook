@@ -16,39 +16,58 @@ and any consequent failure, is purely the responsibility of the user.
 Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
-#include <iostream>
+#if !defined FTRACKER
+#define FTRACKER
+
+#include <string>
+#include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/video/tracking.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/tracking/tracker.hpp>
 
-#include "featuretracker.h"
+#include "videoprocessor.h"
 
-int main()
-{
-	// Create video procesor instance
-	VideoProcessor processor;
+class VisualTracker : public FrameProcessor {
+	
+	cv::Ptr<cv::Tracker> tracker;
+	cv::Rect2d box;
+	bool reset;
 
-	// Create feature tracker instance
-	FeatureTracker tracker;
+  public:
 
-	// Open video file
-	processor.setInput("bike.avi");
+	VisualTracker() : reset(true) {
+	
+		tracker = cv::TrackerMedianFlow::createTracker();
+//		tracker = cv::TrackerKCF::createTracker();
+	}
 
-	// set frame processor
-	processor.setFrameProcessor(&tracker);
+	void setBoundingBox(const cv::Rect2d& bb) {
 
-	// Declare a window to display the video
-	processor.displayOutput("Tracked Features");
+		box = bb;
+		reset = true;
+	}
+	
+	// processing method
+	void process(cv:: Mat &frame, cv:: Mat &output) {
 
-	// Play the video at the original frame rate
-	processor.setDelay(1000./processor.getFrameRate());
+		if (reset) {
+			reset = false;
 
-	processor.stopAtFrameNo(90);
+			tracker->init(frame, box);
 
-	// Start the process
-	processor.run();
 
-	cv::waitKey();
-}
+		} else {
+		
+			tracker->update(frame, box);
+		}
+
+	//	cv::Rect(box.x,box.y)
+	
+		frame.copyTo(output);
+		cv::rectangle(output, box, cv::Scalar(255, 255, 255), 2);
+	}
+};
+
+#endif
