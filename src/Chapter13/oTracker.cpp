@@ -35,6 +35,7 @@ int main()
 	std::string prefix = "goose/goose";
 	std::string ext = ".bmp";
 
+	// Add the image names to be used for tracking
 	for (long i = 130; i < 317; i++) {
 
 		std::string name(prefix);
@@ -46,7 +47,7 @@ int main()
 	}
 
 	// Create feature tracker instance
-	VisualTracker tracker;
+	VisualTracker tracker(cv::TrackerMedianFlow::createTracker());
 
 	// Open video file
 	processor.setInput(imgs);
@@ -57,11 +58,13 @@ int main()
 	// Declare a window to display the video
 	processor.displayOutput("Tracked object");
 
-	// Play the video at the original frame rate
+	// Define the frame rate for display
 	processor.setDelay(50);
 
+	// Specify the original target position
 	tracker.setBoundingBox(cv::Rect(290,100,65,40));
-	// Start the process
+
+	// Start the tracking
 	processor.run();
 
 	cv::waitKey();

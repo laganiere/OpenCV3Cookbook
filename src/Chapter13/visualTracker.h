@@ -37,34 +37,32 @@ class VisualTracker : public FrameProcessor {
 
   public:
 
-	VisualTracker() : reset(true) {
-	
-		tracker = cv::TrackerMedianFlow::createTracker();
-//		tracker = cv::TrackerKCF::createTracker();
-	}
+	// constructor specifying the tracker to be used
+	VisualTracker(cv::Ptr<cv::Tracker> tracker) : 
+		             reset(true), tracker(tracker) {}
 
+	// set the bounding box to initiate tracking
 	void setBoundingBox(const cv::Rect2d& bb) {
 
 		box = bb;
 		reset = true;
 	}
 	
-	// processing method
+	// callback processing method
 	void process(cv:: Mat &frame, cv:: Mat &output) {
 
-		if (reset) {
+		if (reset) { // new tracking session
 			reset = false;
 
 			tracker->init(frame, box);
 
 
-		} else {
+		} else { // update the target's position
 		
 			tracker->update(frame, box);
 		}
 
-	//	cv::Rect(box.x,box.y)
-	
+		// draw bounding box on current frame
 		frame.copyTo(output);
 		cv::rectangle(output, box, cv::Scalar(255, 255, 255), 2);
 	}
