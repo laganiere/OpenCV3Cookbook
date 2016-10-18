@@ -29,7 +29,7 @@ int main()
 {
 	// Create video procesor instance
 	VideoProcessor processor;
-
+	
 	// generate the filename
 	std::vector<std::string> imgs;
 	std::string prefix = "goose/goose";
@@ -47,7 +47,9 @@ int main()
 	}
 
 	// Create feature tracker instance
-	VisualTracker tracker(cv::TrackerMedianFlow::createTracker());
+	cv::Ptr<cv::TrackerMedianFlow> ptr= cv::TrackerMedianFlow::createTracker();
+	VisualTracker tracker(ptr);
+	// VisualTracker tracker(cv::TrackerKCF::createTracker());
 
 	// Open video file
 	processor.setInput(imgs);
@@ -62,10 +64,51 @@ int main()
 	processor.setDelay(50);
 
 	// Specify the original target position
-	tracker.setBoundingBox(cv::Rect(290,100,65,40));
+	cv::Rect bb(290, 100, 65, 40);
+	tracker.setBoundingBox(bb);
 
 	// Start the tracking
 	processor.run();
+
+	cv::waitKey();
+
+	// Illustration of the Median Tracker principle
+	cv::Mat image1 = cv::imread("goose/goose130.bmp", cv::ImreadModes::IMREAD_GRAYSCALE);
+
+	// define a regular grid of points
+	std::vector<cv::Point2f> grid;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			cv::Point2f p(bb.x+i*bb.width/10.,bb.y+j*bb.height/10);
+			grid.push_back(p);
+		}
+	}
+
+	// track in next image
+	cv::Mat image2 = cv::imread("goose/goose131.bmp", cv::ImreadModes::IMREAD_GRAYSCALE);
+	std::vector<cv::Point2f> newPoints;
+	std::vector<uchar> status; // status of tracked features
+	std::vector<float> err;    // error in tracking
+
+	// track the points
+	cv::calcOpticalFlowPyrLK(image1, image2, // 2 consecutive images
+		grid,      // input point position in first image
+		newPoints, // output point postion in the second image
+		status,    // tracking success
+		err);      // tracking error
+
+	// Draw the points
+	for (cv::Point2f p : grid) {
+
+		cv::circle(image1, p, 1, cv::Scalar(255, 255, 255), -1);
+	}
+	cv::imshow("Initial points", image1);
+
+	for (cv::Point2f p : newPoints) {
+
+		cv::circle(image2, p, 1, cv::Scalar(255, 255, 255), -1);
+	}
+	cv::imshow("Tracked points", image2);
 
 	cv::waitKey();
 }
