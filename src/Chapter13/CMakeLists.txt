@@ -1,4 +1,4 @@
-# cmake for OpenCV Cookbook 3rd edition chapter 12
+# cmake for OpenCV Cookbook 3rd edition chapter 13
 # your opencv/build directory should be in your system PATH
 
 # set minimum required version for cmake

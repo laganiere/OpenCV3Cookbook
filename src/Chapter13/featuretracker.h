@@ -121,7 +121,7 @@ class FeatureTracker : public FrameProcessor {
 	// here we keep only moving points
 	bool acceptTrackedPoint(int i) {
 
-		return status[i] &&
+		return status[i] && // status is false if unable to track point i
 			// if point has moved
 			(abs(points[0][i].x-points[1][i].x)+
 			(abs(points[0][i].y-points[1][i].y))>2);

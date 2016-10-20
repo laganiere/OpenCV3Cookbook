@@ -5,7 +5,7 @@ by Robert Laganiere, Packt Publishing, 2016.
 
 Files: 
 	featuretracker.h
-	traking.cpp
+	traker.cpp
 correspond to Recipe:
 Tracing feature points in a video
 
@@ -18,5 +18,6 @@ Files:
 	oTracker.cpp.h
 Tracking an object in a video
 
-You need the image sequence:
-goose/
+You need the image sequences:
+bike.avi
+goose/*
