@@ -5,7 +5,6 @@
 cmake_minimum_required(VERSION 2.8)
 
 # add executable
-add_executable( describeImage describeImage.cpp)
 add_executable( recognizeFace recognizeFace.cpp)
 add_executable( trainCascade trainCascade.cpp)
 add_executable( detectFaces detectFaces.cpp)
@@ -14,7 +13,6 @@ add_executable( detectPeople detectPeople.cpp)
 add_executable( bagWords bagWords.cpp)
 
 # link libraries
-target_link_libraries( describeImage ${OpenCV_LIBS})
 target_link_libraries( recognizeFace ${OpenCV_LIBS})
 target_link_libraries( trainCascade ${OpenCV_LIBS})
 target_link_libraries( detectFaces ${OpenCV_LIBS})
@@ -23,7 +21,12 @@ target_link_libraries( detectPeople ${OpenCV_LIBS})
 target_link_libraries( bagWords ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
-SET (IMAGES ${CMAKE_SOURCE_DIR}/images/bike.avi)
+SET (IMAGES ${CMAKE_SOURCE_DIR}/images/girl.jpg
+     IMAGES ${CMAKE_SOURCE_DIR}/images/face0_1.png
+     IMAGES ${CMAKE_SOURCE_DIR}/images/face0_2.png
+     IMAGES ${CMAKE_SOURCE_DIR}/images/face1_1.png
+     IMAGES ${CMAKE_SOURCE_DIR}/images/face1_2.png
+)
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")
 FILE(COPY ${IMAGES} DESTINATION "Release")

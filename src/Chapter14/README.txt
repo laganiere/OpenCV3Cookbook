@@ -4,7 +4,6 @@ Third Edition
 by Robert Laganiere, Packt Publishing, 2016.
 
 Files: 
-	describeImage.cpp
         recognizeFace.cpp
 correspond to Recipe:
 Describing image patterns
@@ -28,4 +27,8 @@ Tracing feature points in a video
 
 
 You need the images:
-xx
+girl.jpg
+face0_1.png
+face0_2.png
+face1_1.png
+face1_2.png
