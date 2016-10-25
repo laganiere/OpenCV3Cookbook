@@ -22,10 +22,10 @@ target_link_libraries( bagWords ${OpenCV_LIBS})
 
 # copy required images to every directory with executable
 SET (IMAGES ${CMAKE_SOURCE_DIR}/images/girl.jpg
-     IMAGES ${CMAKE_SOURCE_DIR}/images/face0_1.png
-     IMAGES ${CMAKE_SOURCE_DIR}/images/face0_2.png
-     IMAGES ${CMAKE_SOURCE_DIR}/images/face1_1.png
-     IMAGES ${CMAKE_SOURCE_DIR}/images/face1_2.png
+            ${CMAKE_SOURCE_DIR}/images/face0_1.png
+            ${CMAKE_SOURCE_DIR}/images/face0_2.png
+            ${CMAKE_SOURCE_DIR}/images/face1_1.png
+            ${CMAKE_SOURCE_DIR}/images/face1_2.png
 )
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")
