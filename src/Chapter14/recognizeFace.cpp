@@ -74,10 +74,10 @@ int main()
 	cv::imshow("LBP image", lbpImage);
 
 	cv::Ptr<cv::face::FaceRecognizer> recognizer =
-		cv::face::createLBPHFaceRecognizer(1,    // radius of LBP pattern 
-			                               8,    // the number of neighboring pixels to consider
-			                               8, 8, // grid size
-			                               200.8); // minimum distance to nearest neighbor
+		cv::face::createLBPHFaceRecognizer(1,      // radius of LBP pattern 
+			                               8,      // the number of neighboring pixels to consider
+			                               8, 8,   // grid size
+			                               200.);  // minimum distance to nearest neighbor
 
 	// vectors of reference image and their labels
 	std::vector<cv::Mat> referenceImages;
@@ -91,6 +91,17 @@ int main()
 	labels.push_back(1); // person 1
 	referenceImages.push_back(cv::imread("face1_2.png", cv::IMREAD_GRAYSCALE));
 	labels.push_back(1); // person 1
+
+	// the first 8 positive samples
+	cv::Mat faceImages(2 * referenceImages[0].rows, 2 * referenceImages[0].cols, CV_8U);
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 2; j++) { 
+
+			referenceImages[i * 2 + j].copyTo(faceImages(cv::Rect(j*referenceImages[i * 2 + j].cols, i*referenceImages[i * 2 + j].rows, referenceImages[i * 2 + j].cols, referenceImages[i * 2 + j].rows)));
+		}
+
+	cv::resize(faceImages, faceImages, cv::Size(), 0.5, 0.5);
+	cv::imshow("Reference faces", faceImages);
 
 	// train the recognizer by 
 	// computing the LBPHs

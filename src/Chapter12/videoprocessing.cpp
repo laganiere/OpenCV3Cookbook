@@ -82,9 +82,9 @@ int main()
 		std::cout << name <<std::endl;
 		
 		cv::Mat test;
-		cv::resize(frame, test, cv::Size(), 0.2,0.2);
-//		cv::imwrite(name, frame);
-		cv::imwrite(name, test);
+		//      cv::resize(frame, test, cv::Size(), 0.2,0.2);
+		//		cv::imwrite(name, frame);
+        //		cv::imwrite(name, test);
 
 		// introduce a delay
 		// or press key to stop

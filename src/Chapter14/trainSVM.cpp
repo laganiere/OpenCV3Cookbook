@@ -22,6 +22,7 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/ml.hpp>
 
 void drawHOG(std::vector<float> &hog, cv::Mat &image, float scale=1.0) {
 
@@ -89,21 +90,22 @@ int main()
 	cv::Mat image = imread("girl.jpg", cv::IMREAD_GRAYSCALE);
 	cv::imshow("Original image", image);
 
-	cv::HOGDescriptor hog(cv::Size((image.cols/16)*16, (image.rows/16)*16), // size of the window
+	cv::HOGDescriptor hog(cv::Size((image.cols / 16) * 16, (image.rows / 16) * 16), // size of the window
 		cv::Size(8, 4),    // block size
 		cv::Size(8, 4),    // block stride
 		cv::Size(4, 4),    // cell size
 		9);                // number of bins
 
 	std::vector<float> descriptors;
-//	hog.compute(image(cv::Rect(50, 50, 64, 128)), descriptors, cv::Size(64, 128));
+	//	hog.compute(image(cv::Rect(50, 50, 64, 128)), descriptors, cv::Size(64, 128));
 	hog.compute(image, descriptors);
 
 	std::vector<float> vec;
 	cv::Mat im(8, 8, CV_8U, cv::Scalar(0));
-	std::cout << descriptors.size() << " = " << 9*(image.rows/4) * (image.cols/4) <<std::endl;
-	for (int i = 0; i < 9; i++) { std::cout << descriptors[i] << std::endl;
-	vec.push_back(descriptors[i]);
+	std::cout << descriptors.size() << " = " << 9 * (image.rows / 4) * (image.cols / 4) << std::endl;
+	for (int i = 0; i < 9; i++) {
+		std::cout << descriptors[i] << std::endl;
+		vec.push_back(descriptors[i]);
 	}
 	float sum = 0.;
 	for (int i = 0; i < 9; i++) sum += descriptors[i];
@@ -145,7 +147,6 @@ int main()
 		std::ostringstream ss; ss << std::setfill('0') << std::setw(2) << i; name += ss.str();
 		name += ext;
 
-		std::cout << name << std::endl;
 		positives.push_back(cv::imread(name, cv::IMREAD_GRAYSCALE));
 	}
 
@@ -171,7 +172,6 @@ int main()
 		std::ostringstream ss; ss << std::setfill('0') << std::setw(2) << i; name += ss.str();
 		name += ext;
 
-		std::cout << name << std::endl;
 		negatives.push_back(cv::imread(name, cv::IMREAD_GRAYSCALE));
 	}
 
@@ -181,7 +181,6 @@ int main()
 		for (int j = 0; j < 4; j++) {
 
 			negatives[i * 4 + j].copyTo(negSamples(cv::Rect(j*negatives[i * 4 + j].cols, i*negatives[i * 4 + j].rows, negatives[i * 4 + j].cols, negatives[i * 4 + j].rows)));
-
 		}
 
 	cv::imshow("Negative samples", negSamples);
@@ -192,257 +191,77 @@ int main()
 		cv::Size(4, 4),    // cell size
 		9);                // number of bins
 
-
+	// compute first descriptor 
 	std::vector<float> desc;
+	hogDesc.compute(positives[0], desc);
+
+	// the matrix of sample descriptors
+	int featureSize = desc.size();
+	int numberOfSamples = positives.size() - 2    // we do not use the last 2 samples
+		+ negatives.size() - 2;
+	cv::Mat samples(numberOfSamples, featureSize, CV_32FC1);
+
+	// fill first row with first descriptor
+	for (int i = 0; i < featureSize; i++)
+		samples.ptr<float>(0)[i] = desc[i];
+
 	// compute descriptor of first 8 positive samples
-	for (int i = 0; i < 8; i++)
-		hogDesc.compute(positives[i], descriptors);
+	for (int j = 1; j < 8; j++) {
+		hogDesc.compute(positives[j], desc);
+		// fill the next row with current descriptor
+		for (int i = 0; i < featureSize; i++)
+			samples.ptr<float>(j)[i] = desc[i];
+	}
+
 	// compute descriptor of first 8 negative samples
-	for (int i = 0; i < 8; i++)
-		hogDesc.compute(negatives[i], descriptors);
+	for (int j = 0; j < 8; j++) {
+		hogDesc.compute(negatives[j], desc);
+		// fill the next row with current descriptor
+		for (int i = 0; i < featureSize; i++)
+			samples.ptr<float>(j + 8)[i] = desc[i];
+	}
 
-	/*
-
-	tr<ml::SVM> svm = ml::SVM::create();
-	svm->setType(ml::SVM::C_SVC);
-	svm->setKernel(ml::SVM::POLY);
-	svm->setGamma(3);
-
-	Mat trainData; // one row per feature
-	Mat labels;
-	Ptr<ml::TrainData> tData = ml::TrainData::create(trainData, ml::SampleTypes::ROW_SAMPLE, labels);
-	svm->train(tData);
-	// ...
-	Mat query; // input, 1channel, 1 row (apply reshape(1,1) if nessecary)
-	Mat res;   // output
-	svm->predict(query, res);
+	// Create label matrix according to the big feature matrix
+	cv::Mat labels(numberOfSamples, 1, CV_32SC1);
+	labels.rowRange(0, 8) = 1.0;   // labels of positive samples
+	labels.rowRange(8, 16) = -1.0; // labels of negative samples
 
 
-	Size(0, 0), Size(0, 0), locations);
-	//variables
-	char FullFileName[100];
-	char FirstFileName[100] = "./images/upperbody";
-	char SaveHogDesFileName[100] = "Positive.xml";
-	int FileNum = 96;
+	// create SVM classifier
+	cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+	svm->setType(cv::ml::SVM::C_SVC);
+	svm->setKernel(cv::ml::SVM::LINEAR);
 
-	vector< vector < float> > v_descriptorsValues;
-	vector< vector < Point> > v_locations;
+	// prepare the training data
+	cv::Ptr<cv::ml::TrainData> trainingData =
+		cv::ml::TrainData::create(samples, cv::ml::SampleTypes::ROW_SAMPLE, labels);
 
+	// SVM training
+	svm->train(trainingData);
 
-	for (int i = 0; i< FileNum; ++i)
-	{
-		sprintf_s(FullFileName, "%s%d.png", FirstFileName, i + 1);
-		printf("%s\n", FullFileName);
+	cv::Mat queries(4, featureSize, CV_32FC1);
 
-		//read image file
-		Mat img, img_gray;
-		img = imread(FullFileName);
+	// fill the rows with query descriptors
+	hogDesc.compute(positives[8], desc);
+	for (int i = 0; i < featureSize; i++)
+		queries.ptr<float>(0)[i] = desc[i];
+	hogDesc.compute(positives[9], desc);
+	for (int i = 0; i < featureSize; i++)
+		queries.ptr<float>(1)[i] = desc[i];
+	hogDesc.compute(negatives[8], desc);
+	for (int i = 0; i < featureSize; i++)
+		queries.ptr<float>(2)[i] = desc[i];
+	hogDesc.compute(negatives[9], desc);
+	for (int i = 0; i < featureSize; i++)
+		queries.ptr<float>(3)[i] = desc[i];
+	cv::Mat predictions;
 
-		//resizing
-		resize(img, img, Size(64, 48)); //Size(64,48) ); //Size(32*2,16*2)); //Size(80,72) ); 
-										//gray
-		cvtColor(img, img_gray, CV_RGB2GRAY);
+	// Test the classifier with the last two pos and neg samples
+	svm->predict(queries, predictions);
+	std::cout << "Predicted classes:\n";
+	
+	for (int i = 0; i < 4; i++)
+		std::cout << "query: " << i << ": " << ((predictions.at<float>(i, 0) < 0.0)? "Negative" : "Positive") << std::endl;
 
-		//extract feature
-		HOGDescriptor d(Size(32, 16), Size(8, 8), Size(4, 4), Size(4, 4), 9);
-		vector< float> descriptorsValues;
-		vector< Point> locations;
-		d.compute(img_gray, descriptorsValues, Size(0, 0), Size(0, 0), locations);
-
-		//printf("descriptor number =%d\n", descriptorsValues.size() );
-		v_descriptorsValues.push_back(descriptorsValues);
-		v_locations.push_back(locations);
-		//show image
-		imshow("origin", img);
-
-*/
-     cv::waitKey();
+	cv::waitKey();
 }
-
-/*
-Mat VisualizeHoG(Mat& origImg, vector<float>& descriptorValues)
-{
-Mat color_origImg;
-cvtColor(origImg, color_origImg, CV_GRAY2RGB);
-
-float zoomFac = 3;
-Mat visu;
-resize(color_origImg, visu, Size(color_origImg.cols*zoomFac, color_origImg.rows*zoomFac));
-
-int blockSize       = 16;
-int cellSize        = 8;
-int gradientBinSize = 9;
-float radRangeForOneBin = M_PI/(float)gradientBinSize; // dividing 180° into 9 bins, how large (in rad) is one bin?
-
-// prepare data structure: 9 orientation / gradient strenghts for each cell
-int cells_in_x_dir = 64 / cellSize;
-int cells_in_y_dir = 128 / cellSize;
-int totalnrofcells = cells_in_x_dir * cells_in_y_dir;
-float*** gradientStrengths = new float**[cells_in_y_dir];
-int** cellUpdateCounter   = new int*[cells_in_y_dir];
-for (int y=0; y<cells_in_y_dir; y++)
-{
-gradientStrengths[y] = new float*[cells_in_x_dir];
-cellUpdateCounter[y] = new int[cells_in_x_dir];
-for (int x=0; x<cells_in_x_dir; x++)
-{
-gradientStrengths[y][x] = new float[gradientBinSize];
-cellUpdateCounter[y][x] = 0;
-
-for (int bin=0; bin<gradientBinSize; bin++)
-gradientStrengths[y][x][bin] = 0.0;
-}
-}
-
-// nr of blocks = nr of cells - 1
-// since there is a new block on each cell (overlapping blocks!) but the last one
-int blocks_in_x_dir = cells_in_x_dir - 1;
-int blocks_in_y_dir = cells_in_y_dir - 1;
-
-// compute gradient strengths per cell
-int descriptorDataIdx = 0;
-int cellx = 0;
-int celly = 0;
-
-for (int blockx=0; blockx<blocks_in_x_dir; blockx++)
-{
-for (int blocky=0; blocky<blocks_in_y_dir; blocky++)
-{
-// 4 cells per block ...
-for (int cellNr=0; cellNr<4; cellNr++)
-{
-// compute corresponding cell nr
-int cellx = blockx;
-int celly = blocky;
-if (cellNr==1) celly++;
-if (cellNr==2) cellx++;
-if (cellNr==3)
-{
-cellx++;
-celly++;
-}
-
-for (int bin=0; bin<gradientBinSize; bin++)
-{
-float gradientStrength = descriptorValues[ descriptorDataIdx ];
-descriptorDataIdx++;
-
-gradientStrengths[celly][cellx][bin] += gradientStrength;
-
-} // for (all bins)
-
-
-// note: overlapping blocks lead to multiple updates of this sum!
-// we therefore keep track how often a cell was updated,
-// to compute average gradient strengths
-cellUpdateCounter[celly][cellx]++;
-
-} // for (all cells)
-
-
-} // for (all block x pos)
-} // for (all block y pos)
-
-
-// compute average gradient strengths
-for (int celly=0; celly<cells_in_y_dir; celly++)
-{
-for (int cellx=0; cellx<cells_in_x_dir; cellx++)
-{
-
-float NrUpdatesForThisCell = (float)cellUpdateCounter[celly][cellx];
-
-// compute average gradient strenghts for each gradient bin direction
-for (int bin=0; bin<gradientBinSize; bin++)
-{
-gradientStrengths[celly][cellx][bin] /= NrUpdatesForThisCell;
-}
-}
-}
-
-
-cout << "descriptorDataIdx = " << descriptorDataIdx << endl;
-
-// draw cells
-for (int celly=0; celly<cells_in_y_dir; celly++)
-{
-for (int cellx=0; cellx<cells_in_x_dir; cellx++)
-{
-int drawX = cellx * cellSize;
-int drawY = celly * cellSize;
-
-int mx = drawX + cellSize/2;
-int my = drawY + cellSize/2;
-
-rectangle(visu, Point(drawX*zoomFac,drawY*zoomFac), Point((drawX+cellSize)*zoomFac,(drawY+cellSize)*zoomFac), CV_RGB(100,100,100), 1);
-
-// draw in each cell all 9 gradient strengths
-for (int bin=0; bin<gradientBinSize; bin++)
-{
-float currentGradStrength = gradientStrengths[celly][cellx][bin];
-
-// no line to draw?
-if (currentGradStrength==0)
-continue;
-
-float currRad = bin * radRangeForOneBin + radRangeForOneBin/2;
-
-float dirVecX = cos( currRad );
-float dirVecY = sin( currRad );
-float maxVecLen = cellSize/2;
-float scale = 2.5; // just a visualization scale, to see the lines better
-
-// compute line coordinates
-float x1 = mx - dirVecX * currentGradStrength * maxVecLen * scale;
-float y1 = my - dirVecY * currentGradStrength * maxVecLen * scale;
-float x2 = mx + dirVecX * currentGradStrength * maxVecLen * scale;
-float y2 = my + dirVecY * currentGradStrength * maxVecLen * scale;
-
-// draw gradient visualization
-line(visu, Point(x1*zoomFac,y1*zoomFac), Point(x2*zoomFac,y2*zoomFac), CV_RGB(0,255,0), 1);
-
-} // for (all bins)
-
-} // for (cellx)
-} // for (celly)
-
-
-// don't forget to free memory allocated by helper data structures!
-for (int y=0; y<cells_in_y_dir; y++)
-{
-for (int x=0; x<cells_in_x_dir; x++)
-{
-delete[] gradientStrengths[y][x];
-}
-delete[] gradientStrengths[y];
-delete[] cellUpdateCounter[y];
-}
-delete[] gradientStrengths;
-delete[] cellUpdateCounter;
-
-return visu;
-
-} // get_hogdescriptor_visu
-
-
-Cv::Mat anger, disgust;
-// Load the data into anger and disgust
-...
-// Make sure anger.cols == disgust.cols
-// Combine your features from different classes into one big matrix
-int numPostives = anger.rows, numNegatives = disgust.rows;
-int numSamples = numPostives+numNegatives;
-int featureSize = anger.cols;
-cv::Mat data(numSamples, featureSize, CV_32FC1) // Assume your anger matrix is in float type
-cv::Mat positiveData = data.rowRange(0, numPostives);
-cv::Mat negativeData = data.rowRange(numPostives, numSamples);
-anger.copyTo(positiveData);
-disgust.copyTo(negativeData);
-// Create label matrix according to the big feature matrix
-cv::Mat labels(numSamples, 1, CV_32SC1);
-labels.rowRange(0, numPositives).setTo(cv::Scalar_<int>(1));
-labels.rowRange(numPositives, numSamples).setTo(cv::Scalar_<int>(-1));
-// Finally, train your model
-cv::SVM model;
-model.train(data, labels, cv::Mat(), cv::Mat(), cv::SVMParams());
-*/
