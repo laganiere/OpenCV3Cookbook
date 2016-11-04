@@ -20,35 +20,25 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/features2d.hpp>
-#include <opencv2/video/tracking.hpp>
-
-#include "featuretracker.h"
+#include <opencv2/objdetect.hpp>
 
 int main()
 {
-	// Create video procesor instance
-	VideoProcessor processor;
+	cv::Mat inputImage = cv::imread("stopSamples/stop9.jpg", cv::IMREAD_GRAYSCALE);
+		
 
-	// Create feature tracker instance
-	FeatureTracker tracker;
+	cv::CascadeClassifier cascade;
+	if (!cascade.load("stopSamples/classifier/cascade.xml")) { printf("--(!)Error loading face cascade\n"); return -1; };
+	// predict the label of this image
 
-	// Open video file
-	processor.setInput("bike.avi");
+	std::vector<cv::Rect> detections;
 
-	// set frame processor
-	processor.setFrameProcessor(&tracker);
+	cascade.detectMultiScale(inputImage, detections, 1.1, 2, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(24, 24), cv::Size(128, 128));
 
-	// Declare a window to display the video
-	processor.displayOutput("Tracked Features");
+	std::cout << "detections= " << detections.size() << std::endl;
+	for (int i = 0; i < detections.size(); i++)
+		cv::rectangle(inputImage, detections[i], cv::Scalar(255, 255, 255), 2);
 
-	// Play the video at the original frame rate
-	processor.setDelay(1000./processor.getFrameRate());
-
-	processor.stopAtFrameNo(90);
-
-	// Start the process
-	processor.run();
-
+	cv::imshow("Input image", inputImage);
 	cv::waitKey();
 }

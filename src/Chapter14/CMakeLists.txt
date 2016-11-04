@@ -30,4 +30,8 @@ SET (IMAGES ${CMAKE_SOURCE_DIR}/images/girl.jpg
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")
 FILE(COPY ${IMAGES} DESTINATION "Release")
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/stopSamples/ DESTINATION ./stopSamples/)
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/stopSamples/ DESTINATION "Debug/stopSamples/")
+FILE(COPY ${CMAKE_SOURCE_DIR}/images/stopSamples/ DESTINATION "Release/stopSamples/")
+
 
