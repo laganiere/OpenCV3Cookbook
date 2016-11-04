@@ -92,7 +92,7 @@ int main()
 	referenceImages.push_back(cv::imread("face1_2.png", cv::IMREAD_GRAYSCALE));
 	labels.push_back(1); // person 1
 
-	// the first 8 positive samples
+	// the 4 positive samples
 	cv::Mat faceImages(2 * referenceImages[0].rows, 2 * referenceImages[0].cols, CV_8U);
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 2; j++) { 

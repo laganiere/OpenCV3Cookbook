@@ -24,6 +24,31 @@ Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 
 int main()
 {
+	// open the positive sample images
+	std::vector<cv::Mat> referenceImages;
+	referenceImages.push_back(cv::imread("stopSamples/stop00.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop01.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop02.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop03.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop04.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop05.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop06.png"));
+	referenceImages.push_back(cv::imread("stopSamples/stop07.png"));
+
+	// create a composite image
+	cv::Mat positveImages(2 * referenceImages[0].rows, 4 * referenceImages[0].cols, CV_8UC3);
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 4; j++) {
+
+			referenceImages[i * 2 + j].copyTo(positveImages(cv::Rect(j*referenceImages[i * 2 + j].cols, i*referenceImages[i * 2 + j].rows, referenceImages[i * 2 + j].cols, referenceImages[i * 2 + j].rows)));
+		}
+
+	cv::imshow("Positive samples", positveImages);
+
+	cv::Mat negative = cv::imread("stopSamples/bg01.jpg");
+	cv::resize(negative, negative, cv::Size(), 0.33, 0.33);
+	cv::imshow("One negative sample", negative);
+
 	cv::Mat inputImage = cv::imread("stopSamples/stop9.jpg", cv::IMREAD_GRAYSCALE);
 		
 
