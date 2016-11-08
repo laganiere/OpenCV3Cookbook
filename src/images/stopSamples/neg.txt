@@ -7,9 +7,3 @@ bg06.jpg
 bg07.jpg
 bg08.jpg
 bg09.jpg
-boldt.jpg
-church02.jpg
-brebeuf1.jpg
-fundy.jpg
-soup1.jpg
-tower.jpg

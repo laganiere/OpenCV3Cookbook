@@ -49,21 +49,72 @@ int main()
 	cv::resize(negative, negative, cv::Size(), 0.33, 0.33);
 	cv::imshow("One negative sample", negative);
 
-	cv::Mat inputImage = cv::imread("stopSamples/stop9.jpg", cv::IMREAD_GRAYSCALE);
+	cv::Mat inputImage = cv::imread("stopSamples/stop9.jpg");
+	cv::resize(inputImage, inputImage, cv::Size(), 0.5, 0.5);
 		
-
 	cv::CascadeClassifier cascade;
-	if (!cascade.load("stopSamples/classifier/cascade.xml")) { printf("--(!)Error loading face cascade\n"); return -1; };
-	// predict the label of this image
+	if (!cascade.load("stopSamples/classifier/cascade.xml")) { 
+		std::cout << "Error when loading the cascade classfier!" << std::endl; 
+		return -1; 
+	}
 
+	// predict the label of this image
 	std::vector<cv::Rect> detections;
 
-	cascade.detectMultiScale(inputImage, detections, 1.1, 2, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(24, 24), cv::Size(128, 128));
+	cascade.detectMultiScale(inputImage, // input image 
+		                     detections, // detection results
+		                     1.1,        // scale reduction factor
+		                     1,          // number of required neighbor detections
+		                     0,          // flags (not used)
+		                     cv::Size(48, 48),    // minimum object size to be detected
+		                     cv::Size(128, 128)); // maximum object size to be detected
 
 	std::cout << "detections= " << detections.size() << std::endl;
 	for (int i = 0; i < detections.size(); i++)
 		cv::rectangle(inputImage, detections[i], cv::Scalar(255, 255, 255), 2);
 
-	cv::imshow("Input image", inputImage);
+	cv::imshow("Stop sign detection", inputImage);
+
+	// Detecting faces
+	cv::Mat picture = cv::imread("girl.jpg");
+	cv::CascadeClassifier faceCascade;
+	if (!faceCascade.load("haarcascade_frontalface_default.xml")) {
+		std::cout << "Error when loading the face cascade classfier!" << std::endl;
+		return -1;
+	}
+
+	faceCascade.detectMultiScale(picture, // input image 
+		detections, // detection results
+		1.1,        // scale reduction factor
+		3,          // number of required neighbor detections
+		0,          // flags (not used)
+		cv::Size(48, 48),    // minimum object size to be detected
+		cv::Size(128, 128)); // maximum object size to be detected
+
+	std::cout << "detections= " << detections.size() << std::endl;
+	for (int i = 0; i < detections.size(); i++)
+		cv::rectangle(picture, detections[i], cv::Scalar(255, 255, 255), 2);
+
+	// Detecting eyes
+	cv::CascadeClassifier eyeCascade;
+	if (!eyeCascade.load("haarcascade_eye.xml")) {
+		std::cout << "Error when loading the eye cascade classfier!" << std::endl;
+		return -1;
+	}
+
+	eyeCascade.detectMultiScale(picture, // input image 
+		detections, // detection results
+		1.1,        // scale reduction factor
+		3,          // number of required neighbor detections
+		0,          // flags (not used)
+		cv::Size(24, 24),    // minimum object size to be detected
+		cv::Size(64, 64)); // maximum object size to be detected
+
+	std::cout << "detections= " << detections.size() << std::endl;
+	for (int i = 0; i < detections.size(); i++)
+		cv::rectangle(picture, detections[i], cv::Scalar(0, 0, 0), 2);
+
+	cv::imshow("Detection results", picture);
+
 	cv::waitKey();
 }

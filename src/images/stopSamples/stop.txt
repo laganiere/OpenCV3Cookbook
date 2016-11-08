@@ -7,4 +7,3 @@ stop05.png 1 0 0 64 64
 stop06.png 1 0 0 64 64
 stop07.png 1 0 0 64 64
 stop08.png 1 0 0 64 64
-stop09.png 1 0 0 64 64
