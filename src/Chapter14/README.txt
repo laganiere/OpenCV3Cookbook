@@ -6,25 +6,17 @@ by Robert Laganiere, Packt Publishing, 2016.
 Files: 
         recognizeFace.cpp
 correspond to Recipe:
-Describing image patterns
+Recognizing faces using nearest neighbors of local binary patterns
 
 Files: 
-	trainCascade.cpp
-        detectFace.cpp
+        detectObjects.cpp
 correspond to Recipe:
-Tracing feature points in a video
+Finding objects and faces with a cascade of Haar features
 
 Files: 
-	trainCSVM.cpp
-        detectPeople.cpp
+	trainSVM.cpp
 correspond to Recipe:
-Tracing feature points in a video
-
-Files: 
-	bagWords.cpp
-correspond to Recipe:
-Tracing feature points in a video
-
+Detecting objects and peoples with Support Vector Machines and histograms of oriented gradients 
 
 You need the images:
 girl.jpg
@@ -32,3 +24,5 @@ face0_1.png
 face0_2.png
 face1_1.png
 face1_2.png
+and the directory:
+stopSamples/

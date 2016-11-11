@@ -92,6 +92,7 @@ int main()
 		cv::Size(128, 128)); // maximum object size to be detected
 
 	std::cout << "detections= " << detections.size() << std::endl;
+	// draw detections on image
 	for (int i = 0; i < detections.size(); i++)
 		cv::rectangle(picture, detections[i], cv::Scalar(255, 255, 255), 2);
 
@@ -111,6 +112,7 @@ int main()
 		cv::Size(64, 64)); // maximum object size to be detected
 
 	std::cout << "detections= " << detections.size() << std::endl;
+	// draw detections on image
 	for (int i = 0; i < detections.size(); i++)
 		cv::rectangle(picture, detections[i], cv::Scalar(0, 0, 0), 2);
 
