@@ -55,56 +55,38 @@ void drawHOG(std::vector<float>::const_iterator hog, // iterator to the HOG
 	}
 }
 
-void drawHOGDescriptors(const cv::Mat &image, cv::Mat &hogImage, cv::Size cellSize, int nBins) {
+// Draw HOG over an image
+void drawHOGDescriptors(const cv::Mat &image,  // the input image 
+	                    cv::Mat &hogImage,     // the resulting HOG image
+	                    cv::Size cellSize,     // size of each cell (blocks are ignored)
+	                    int nBins) {           // number of bins
 
+	// block size is image size
 	cv::HOGDescriptor hog(cv::Size((image.cols / cellSize.width) * cellSize.width, 
 		                           (image.rows / cellSize.height) * cellSize.height),
 		cv::Size((image.cols / cellSize.width) * cellSize.width,
 			(image.rows / cellSize.height) * cellSize.height),	
-//		cellSize,    // block size
-		cellSize,    // block stride
+		cellSize,    // block stride (ony 1 block here)
 		cellSize,    // cell size
 		nBins);      // number of bins
 
+	// compute HOG
 	std::vector<float> descriptors;
 	hog.compute(image, descriptors);
 
 	float scale= 2.0 / *std::max_element(descriptors.begin(), descriptors.end());
 
-	std::cout << "max="<< *std::max_element(descriptors.begin(), descriptors.end()) << std::endl;
-
-	std::cout << std::endl;
-	for (int i = 0; i < descriptors.size(); i++) {
-
-		std::cout << descriptors[i];
-		if (i % 9 == 0) std::cout << std::endl;
-	}
-	std::cout << std::endl;
-
 	hogImage.create(image.rows, image.cols, CV_8U);
-//	hogImage= image.clone();
-//	hogImage = 0;
-	/*
-	std::vector<float> vec;
-	vec.push_back(0.6);
-	vec.push_back(0.1);
-	vec.push_back(0.1);
-	vec.push_back(0.5);
-	vec.push_back(0.1);
-	vec.push_back(0.1);
-	vec.push_back(0.9);
-	vec.push_back(0.3);
-	vec.push_back(0.1);
-	*/
+
 	std::vector<float>::const_iterator itDesc= descriptors.begin();
 
 	for (int i = 0; i < image.rows / cellSize.height; i++) {
 		for (int j = 0; j < image.cols / cellSize.width; j++) {
-
+			// draw wach cell
 			hogImage(cv::Rect(j*cellSize.width, i*cellSize.height, cellSize.width, cellSize.height));
-			drawHOG(itDesc, 9, hogImage(cv::Rect(j*cellSize.width, i*cellSize.height,
+			drawHOG(itDesc, nBins, hogImage(cv::Rect(j*cellSize.width, i*cellSize.height,
 				                           cellSize.width, cellSize.height)), scale);
-			itDesc += 9;
+			itDesc += nBins;
 		}
 	}
 }
@@ -212,14 +194,14 @@ int main()
 	}
 
 	// compute descriptor of the negative samples
-	for (int j = 0; j < 8; j++) {
+	for (int j = 0; j < negatives.size(); j++) {
 		hogDesc.compute(negatives[j], desc);
 		// fill the next row with current descriptor
 		for (int i = 0; i < featureSize; i++)
-			samples.ptr<float>(j + 8)[i] = desc[i];
+			samples.ptr<float>(j + positives.size())[i] = desc[i];
 	}
 
-	// Create label matrix according to the big feature matrix
+	// Create the labels
 	cv::Mat labels(numberOfSamples, 1, CV_32SC1);
 	// labels of positive samples
 	labels.rowRange(0, positives.size()) = 1.0;   
@@ -257,17 +239,17 @@ int main()
 
 	// Test the classifier with the last two pos and neg samples
 	svm->predict(queries, predictions);
-	std::cout << "Predicted classes:\n";
-	
-	for (int i = 0; i < 4; i++)
-		std::cout << "query: " << i << ": " << ((predictions.at<float>(i, 0) < 0.0)? "Negative" : "Positive") << std::endl;
 
-	cv::Mat myImage = imread("people.jpg", cv::IMREAD_GRAYSCALE);
+	for (int i = 0; i < 4; i++)
+		std::cout << "query: " << i << ": " << ((predictions.at<float>(i) < 0.0)? "Negative" : "Positive") << std::endl;
+
+	// People detection
+	cv::Mat myImage = imread("person.jpg", cv::IMREAD_GRAYSCALE);
 
 	std::vector<cv::Rect> peoples;
 	cv::HOGDescriptor peopleHog;
 	peopleHog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
-	peopleHog.detectMultiScale(myImage, peoples, 0, cv::Size(4, 4), cv::Size(32, 32), 1.05, 2.0);
+	peopleHog.detectMultiScale(myImage, peoples, 0, cv::Size(4, 4), cv::Size(32, 32), 1.1, 2.0);
 
 	// draw detections on image
 	std::cout << "Number of peoples detected: " << peoples.size() << std::endl;
