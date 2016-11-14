@@ -20,6 +20,7 @@ SET (IMAGES ${CMAKE_SOURCE_DIR}/images/girl.jpg
             ${CMAKE_SOURCE_DIR}/images/face0_2.png
             ${CMAKE_SOURCE_DIR}/images/face1_1.png
             ${CMAKE_SOURCE_DIR}/images/face1_2.png
+            ${CMAKE_SOURCE_DIR}/images/person.jpg
 )
 FILE(COPY ${IMAGES} DESTINATION .)
 FILE(COPY ${IMAGES} DESTINATION "Debug")

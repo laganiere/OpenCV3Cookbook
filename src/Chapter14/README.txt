@@ -24,5 +24,6 @@ face0_1.png
 face0_2.png
 face1_1.png
 face1_2.png
+person.jpg
 and the directory:
 stopSamples/

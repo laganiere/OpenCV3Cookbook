@@ -246,17 +246,25 @@ int main()
 	// People detection
 	cv::Mat myImage = imread("person.jpg", cv::IMREAD_GRAYSCALE);
 
+	// create the detector
 	std::vector<cv::Rect> peoples;
 	cv::HOGDescriptor peopleHog;
 	peopleHog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
-	peopleHog.detectMultiScale(myImage, peoples, 0, cv::Size(4, 4), cv::Size(32, 32), 1.1, 2.0);
+	// detect peoples oin an image
+	peopleHog.detectMultiScale(myImage, // input image
+		peoples, // ouput list of bounding boxes 
+		0,       // threshold to consider a detection to be positive 
+		cv::Size(4, 4),   // window stride 
+		cv::Size(32, 32), // image padding
+		1.1,              // scale factor
+		2);               // grouping threshold (0 means no grouping) 
 
 	// draw detections on image
 	std::cout << "Number of peoples detected: " << peoples.size() << std::endl;
 	for (int i = 0; i < peoples.size(); i++)
 		cv::rectangle(myImage, peoples[i], cv::Scalar(255, 255, 255), 2);
 
-	cv::imshow("People", myImage);
+	cv::imshow("People detection", myImage);
 
 	cv::waitKey();
 }
