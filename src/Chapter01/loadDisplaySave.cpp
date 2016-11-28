@@ -1,19 +1,19 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 1 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library 
-   Second Edition 
-   by Robert Laganiere, Packt Publishing, 2013.
+This file contains material supporting chapter 1 of the book:
+OpenCV3 Computer Vision Application Programming Cookbook
+Third Edition
+by Robert Laganiere, Packt Publishing, 2016.
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2013 Robert Laganiere, www.laganiere.name
+This program is free software; permission is hereby granted to use, copy, modify,
+and distribute this source code, or portions thereof, for any purpose, without fee,
+subject to the restriction that the copyright notice may not be removed
+or altered from any source or altered source distribution.
+The software is released on an as-is basis and without any warranties of any kind.
+In particular, the software is not guaranteed to be fault-tolerant or free from failure.
+The author disclaims all warranties with regard to this software, any use,
+and any consequent failure, is purely the responsibility of the user.
+
+Copyright (C) 2016 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
 #include <iostream>
@@ -29,7 +29,7 @@ void onMouse( int event, int x, int y, int flags, void* param)	{
 
     switch (event) {	// dispatch the event
 
-		case CV_EVENT_LBUTTONDOWN: // mouse button down event
+		case cv::EVENT_LBUTTONDOWN: // mouse button down event
 
 			// display pixel value at (x,y)
 			std::cout << "at (" << x << "," << y << ") value is: " 
@@ -45,7 +45,7 @@ int main() {
               << image.cols << std::endl;
 
 	// read the input image as a gray-scale image
-	image=  cv::imread("puppy.bmp", CV_LOAD_IMAGE_GRAYSCALE); 
+	image=  cv::imread("puppy.bmp", cv::IMREAD_GRAYSCALE); 
 
     if (image.empty()) {  // error handling
         // no image has been created...
@@ -80,7 +80,7 @@ int main() {
                 // the given amount of msec
 
 	cv::imwrite("output.bmp", result); // save result
-
+	
 	// create another image window named
 	cv::namedWindow("Drawing on an Image"); // define the window
 
@@ -89,7 +89,7 @@ int main() {
 			   65,                 // radius  
 			   0,                  // color (here black)
 			   3);                 // thickness
-
+	
 	cv::putText(image,                   // destination image
 		        "This is a dog.",        // text
 				cv::Point(40,200),       // text position
@@ -101,7 +101,7 @@ int main() {
 	cv::imshow("Drawing on an Image", image); // show the image
 
 	cv::waitKey(0); // 0 to indefinitely wait for a key pressed
-
+	
 	return 0;
 }
 
