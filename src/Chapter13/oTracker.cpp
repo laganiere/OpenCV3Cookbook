@@ -47,7 +47,7 @@ int main()
 	}
 
 	// Create feature tracker instance
-	cv::Ptr<cv::TrackerMedianFlow> ptr= cv::TrackerMedianFlow::createTracker();
+	cv::Ptr<cv::TrackerMedianFlow> ptr= cv::TrackerMedianFlow::create();
 	VisualTracker tracker(ptr);
 	// VisualTracker tracker(cv::TrackerKCF::createTracker());
 
