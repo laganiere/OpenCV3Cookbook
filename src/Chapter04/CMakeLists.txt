@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # add executable
 add_executable( histograms histograms.cpp)
-add_executable( contentfinder contentfinder.cpp)
+add_executable( contentfinder contentFinder.cpp)
 add_executable( finder finder.cpp)
 add_executable( retrieve retrieve.cpp)
 add_executable( integral integral.cpp)
